@@ -1,0 +1,42 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'motion-control-playground'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=motion-control-playground",
+                    "--package=motion-control-playground"
+                ],
+                "filter": {
+                    "name": "motion-control-playground",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'motion-control-playground'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=motion-control-playground",
+                    "--package=motion-control-playground"
+                ],
+                "filter": {
+                    "name": "motion-control-playground",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}
