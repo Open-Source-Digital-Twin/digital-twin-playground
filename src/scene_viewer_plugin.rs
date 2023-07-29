@@ -195,6 +195,7 @@ impl CameraTracker {
     }
 }
 
+#[allow(clippy::type_complexity)]
 fn camera_tracker(
     mut camera_tracker: ResMut<CameraTracker>,
     keyboard_input: Res<Input<KeyCode>>,
