@@ -41,10 +41,12 @@ jobs:
 
       - name: Setup Pages
         uses: actions/configure-pages@v2
-      - name: Upload artifacts
+      - name: Add assets to dist
+        run: cp -r ./assets ./dist
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
-          path: '{./dist,./assets}'
+          path: './dist'
 
   deploy:
     needs: build
