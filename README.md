@@ -11,8 +11,14 @@ This project is a virtual environment for testing different motion control algor
 
 ## Getting Started
 1. Install Rust.
-2. Clone this repository.
-3. Run `cargo run` to start the project.
+2. Run `cargo install wasm-server-runner`
+3. Add this to your `~/.cargo/config.toml` (**not** the `Cargo.toml` of your project!):
+    ```toml
+    [target.wasm32-unknown-unknown]
+    runner = "wasm-server-runner"
+    ```
+4. Clone this repository.
+5. Run `cargo run --target wasm32-unknown-unknown` to start the project.
 
 ## Controls
 * W - go forward
