@@ -14,13 +14,13 @@ use bevy::{
     window::WindowPlugin,
 };
 
-#[cfg(feature = "animation")]
-mod animation_plugin;
-mod morph_viewer_plugin;
+use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use bevy_rapier3d::prelude::*;
+
 mod scene_viewer_plugin;
 
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
-use morph_viewer_plugin::MorphViewerPlugin;
 use scene_viewer_plugin::{SceneHandle, SceneViewerPlugin};
 
 fn main() {
@@ -45,13 +45,12 @@ fn main() {
             }),
         PanOrbitCameraPlugin,
         SceneViewerPlugin,
-        MorphViewerPlugin,
+        WorldInspectorPlugin::new(),
+        RapierPhysicsPlugin::<NoUserData>::default(),
+        RapierDebugRenderPlugin::default(),
     ))
     .add_systems(Startup, setup)
     .add_systems(PreUpdate, setup_scene_after_load);
-
-    #[cfg(feature = "animation")]
-    app.add_plugins(animation_plugin::AnimationManipulationPlugin);
 
     app.run();
 }
@@ -77,7 +76,6 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         .unwrap_or_else(|| "assets/rotary_pendulum.glb".to_string());
     info!("Loading {}", scene_path);
     let (file_path, scene_index) = parse_scene(scene_path);
-
     commands.insert_resource(SceneHandle::new(asset_server.load(file_path), scene_index));
 }
 

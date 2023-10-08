@@ -7,6 +7,7 @@ use bevy::{
     asset::LoadState, gltf::Gltf, input::common_conditions::input_just_pressed, prelude::*,
     scene::InstanceId,
 };
+use bevy_rapier3d::prelude::{Collider, ComputedColliderShape};
 
 use std::f32::consts::*;
 use std::fmt;
@@ -18,6 +19,7 @@ pub struct SceneHandle {
     instance_id: Option<InstanceId>,
     pub is_loaded: bool,
     pub has_light: bool,
+    pub has_colliders: bool,
 }
 
 impl SceneHandle {
@@ -28,6 +30,7 @@ impl SceneHandle {
             instance_id: None,
             is_loaded: false,
             has_light: false,
+            has_colliders: false,
         }
     }
 }
@@ -64,13 +67,15 @@ pub struct SceneViewerPlugin;
 
 impl Plugin for SceneViewerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(PreUpdate, scene_load_check).add_systems(
-            Update,
-            (
-                update_lights,
-                toggle_bounding_boxes.run_if(input_just_pressed(KeyCode::B)),
-            ),
-        );
+        app.add_systems(PreUpdate, scene_load_check)
+            .add_systems(
+                Update,
+                (
+                    update_lights,
+                    toggle_bounding_boxes.run_if(input_just_pressed(KeyCode::B)),
+                ),
+            )
+        .add_systems(PostStartup, add_colliders);
     }
 }
 
@@ -158,5 +163,30 @@ fn update_lights(
                 -FRAC_PI_4,
             );
         }
+    }
+}
+
+fn add_colliders(
+    mut commands: Commands,
+    mut scene_handle: ResMut<SceneHandle>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+    mut query: Query<(Entity, &Handle<Mesh>, &Handle<StandardMaterial>)>,
+) {
+    if scene_handle.has_colliders {
+        return;
+    }
+
+    for (entity, mesh_handle, material_handle) in &mut query {
+        let mesh = meshes.get_mut(mesh_handle).unwrap();
+        let _material = materials.get_mut(material_handle).unwrap();
+        let collider = Collider::from_bevy_mesh(mesh, &ComputedColliderShape::TriMesh);
+        if let Some(collider) = collider {
+            commands.entity(entity).insert(collider);
+            scene_handle.has_colliders = true;
+        }
+    }
+    if scene_handle.has_colliders {
+        info!("Added colliders to scene");
     }
 }
