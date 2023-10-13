@@ -75,7 +75,7 @@ impl Plugin for SceneViewerPlugin {
                     toggle_bounding_boxes.run_if(input_just_pressed(KeyCode::B)),
                 ),
             )
-        .add_systems(PostStartup, add_colliders);
+            .add_systems(PostUpdate, add_colliders);
     }
 }
 
@@ -183,7 +183,10 @@ fn add_colliders(
         let collider = Collider::from_bevy_mesh(mesh, &ComputedColliderShape::TriMesh);
         if let Some(collider) = collider {
             commands.entity(entity).insert(collider);
+            debug!("Added collider to entity {:?}", entity);
             scene_handle.has_colliders = true;
+        } else {
+            warn!("Failed to create collider for entity {:?}", entity);
         }
     }
     if scene_handle.has_colliders {
