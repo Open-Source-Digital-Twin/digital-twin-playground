@@ -14,7 +14,7 @@ use bevy::{
     window::WindowPlugin,
 };
 
-use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
+use bevy_infinite_grid::{InfiniteGridBundle, InfiniteGridPlugin, InfiniteGrid};
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_rapier3d::prelude::*;
 
@@ -48,6 +48,7 @@ fn main() {
         WorldInspectorPlugin::new(),
         RapierPhysicsPlugin::<NoUserData>::default(),
         RapierDebugRenderPlugin::default(),
+        InfiniteGridPlugin
     ))
     .add_systems(Startup, setup)
     .add_systems(PreUpdate, setup_scene_after_load);
@@ -139,5 +140,13 @@ fn setup_scene_after_load(
 
             scene_handle.has_light = true;
         }
+
+        commands.spawn(InfiniteGridBundle {
+            grid: InfiniteGrid {
+                // shadow_color: None,
+                ..default()
+            },
+            ..default()
+        });
     }
 }
