@@ -7,7 +7,9 @@ use bevy::{
     asset::LoadState, gltf::Gltf, input::common_conditions::input_just_pressed, prelude::*,
     scene::InstanceId,
 };
-use bevy_rapier3d::prelude::{Collider, ComputedColliderShape, RigidBody, AdditionalMassProperties, GravityScale};
+use bevy_rapier3d::prelude::{
+    AdditionalMassProperties, Collider, ComputedColliderShape, GravityScale, RigidBody,
+};
 
 use std::f32::consts::*;
 use std::fmt;
@@ -186,11 +188,12 @@ fn add_colliders(
         let _material = materials.get_mut(material_handle).unwrap();
         let collider = Collider::from_bevy_mesh(mesh, &ComputedColliderShape::TriMesh);
         if let Some(collider) = collider {
-            commands.entity(entity)
-            .insert(RigidBody::Dynamic)
-            .insert(AdditionalMassProperties::Mass(1.0))
-            .insert(GravityScale(1.0))
-            .insert(collider);
+            commands
+                .entity(entity)
+                .insert(RigidBody::Dynamic)
+                .insert(AdditionalMassProperties::Mass(1.0))
+                .insert(GravityScale(1.0))
+                .insert(collider);
             info!("Added collider to entity {:?}", entity);
             scene_handle.has_colliders = true;
         } else {
@@ -201,7 +204,6 @@ fn add_colliders(
         info!("Added colliders to scene");
     }
 }
-
 
 fn add_rigid_bodies(
     mut commands: Commands,
@@ -216,10 +218,11 @@ fn add_rigid_bodies(
     for (entity, mesh_handle) in &mut query {
         let mesh = meshes.get_mut(mesh_handle);
         if let Some(_mesh) = mesh {
-            commands.entity(entity)
-            .insert(RigidBody::Dynamic)
-            .insert(AdditionalMassProperties::Mass(1.0))
-            .insert(GravityScale(1.0));
+            commands
+                .entity(entity)
+                .insert(RigidBody::Dynamic)
+                .insert(AdditionalMassProperties::Mass(1.0))
+                .insert(GravityScale(1.0));
             info!("Added rigid body to entity {:?}", entity);
             scene_handle.has_rigid_bodies = true;
         } else {
@@ -231,13 +234,19 @@ fn add_rigid_bodies(
     }
 }
 
-fn add_ground(
-    mut commands: Commands,
-) {
+fn add_ground(mut commands: Commands) {
     const GROUND_THICKNESS: f32 = 0.01;
     const GROUND_SIDE_SIZE: f32 = 100.0;
-    
+
     commands
-        .spawn(Collider::cuboid(GROUND_SIDE_SIZE, GROUND_THICKNESS, GROUND_SIDE_SIZE))
-        .insert(TransformBundle::from(Transform::from_xyz(0.0, -GROUND_THICKNESS, 0.0)));
+        .spawn(Collider::cuboid(
+            GROUND_SIDE_SIZE,
+            GROUND_THICKNESS,
+            GROUND_SIDE_SIZE,
+        ))
+        .insert(TransformBundle::from(Transform::from_xyz(
+            0.0,
+            -GROUND_THICKNESS,
+            0.0,
+        )));
 }

@@ -14,7 +14,7 @@ use bevy::{
     window::WindowPlugin,
 };
 
-use bevy_infinite_grid::{InfiniteGridBundle, InfiniteGridPlugin, InfiniteGrid};
+use bevy_infinite_grid::{InfiniteGrid, InfiniteGridBundle, InfiniteGridPlugin};
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_rapier3d::prelude::*;
 
@@ -48,7 +48,7 @@ fn main() {
         WorldInspectorPlugin::new(),
         RapierPhysicsPlugin::<NoUserData>::default(),
         RapierDebugRenderPlugin::default(),
-        InfiniteGridPlugin
+        InfiniteGridPlugin,
     ))
     .add_systems(Startup, setup)
     .add_systems(PreUpdate, setup_scene_after_load);
