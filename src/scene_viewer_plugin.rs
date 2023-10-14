@@ -70,6 +70,7 @@ pub struct SceneViewerPlugin;
 impl Plugin for SceneViewerPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(PreUpdate, scene_load_check)
+            .add_systems(Startup, add_ground)
             .add_systems(
                 Update,
                 (
@@ -228,4 +229,15 @@ fn add_rigid_bodies(
     if scene_handle.has_rigid_bodies {
         info!("Added rigid bodies to scene");
     }
+}
+
+fn add_ground(
+    mut commands: Commands,
+) {
+    const GROUND_THICKNESS: f32 = 0.01;
+    const GROUND_SIDE_SIZE: f32 = 100.0;
+    
+    commands
+        .spawn(Collider::cuboid(GROUND_SIDE_SIZE, GROUND_THICKNESS, GROUND_SIDE_SIZE))
+        .insert(TransformBundle::from(Transform::from_xyz(0.0, -GROUND_THICKNESS, 0.0)));
 }
