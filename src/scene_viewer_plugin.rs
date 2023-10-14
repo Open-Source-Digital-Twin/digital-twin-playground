@@ -7,7 +7,7 @@ use bevy::{
     asset::LoadState, gltf::Gltf, input::common_conditions::input_just_pressed, prelude::*,
     scene::InstanceId,
 };
-use bevy_rapier3d::prelude::{Collider, ComputedColliderShape};
+use bevy_rapier3d::prelude::{Collider, ComputedColliderShape, RigidBody, AdditionalMassProperties, GravityScale};
 
 use std::f32::consts::*;
 use std::fmt;
@@ -20,6 +20,7 @@ pub struct SceneHandle {
     pub is_loaded: bool,
     pub has_light: bool,
     pub has_colliders: bool,
+    pub has_rigid_bodies: bool,
 }
 
 impl SceneHandle {
@@ -31,6 +32,7 @@ impl SceneHandle {
             is_loaded: false,
             has_light: false,
             has_colliders: false,
+            has_rigid_bodies: false,
         }
     }
 }
@@ -75,7 +77,8 @@ impl Plugin for SceneViewerPlugin {
                     toggle_bounding_boxes.run_if(input_just_pressed(KeyCode::B)),
                 ),
             )
-            .add_systems(PostUpdate, add_colliders);
+            .add_systems(PostUpdate, add_colliders)
+            .add_systems(PostUpdate, add_rigid_bodies);
     }
 }
 
@@ -182,8 +185,12 @@ fn add_colliders(
         let _material = materials.get_mut(material_handle).unwrap();
         let collider = Collider::from_bevy_mesh(mesh, &ComputedColliderShape::TriMesh);
         if let Some(collider) = collider {
-            commands.entity(entity).insert(collider);
-            debug!("Added collider to entity {:?}", entity);
+            commands.entity(entity)
+            .insert(RigidBody::Dynamic)
+            .insert(AdditionalMassProperties::Mass(1.0))
+            .insert(GravityScale(1.0))
+            .insert(collider);
+            info!("Added collider to entity {:?}", entity);
             scene_handle.has_colliders = true;
         } else {
             warn!("Failed to create collider for entity {:?}", entity);
@@ -191,5 +198,34 @@ fn add_colliders(
     }
     if scene_handle.has_colliders {
         info!("Added colliders to scene");
+    }
+}
+
+
+fn add_rigid_bodies(
+    mut commands: Commands,
+    mut scene_handle: ResMut<SceneHandle>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut query: Query<(Entity, &Handle<Mesh>)>,
+) {
+    if scene_handle.has_rigid_bodies {
+        return;
+    }
+
+    for (entity, mesh_handle) in &mut query {
+        let mesh = meshes.get_mut(mesh_handle);
+        if let Some(_mesh) = mesh {
+            commands.entity(entity)
+            .insert(RigidBody::Dynamic)
+            .insert(AdditionalMassProperties::Mass(1.0))
+            .insert(GravityScale(1.0));
+            info!("Added rigid body to entity {:?}", entity);
+            scene_handle.has_rigid_bodies = true;
+        } else {
+            warn!("Failed to create rigid body for entity {:?}", entity);
+        }
+    }
+    if scene_handle.has_rigid_bodies {
+        info!("Added rigid bodies to scene");
     }
 }
