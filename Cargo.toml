@@ -12,3 +12,11 @@ bevy_panorbit_camera = "0.8.0"
 bevy_rapier3d = { version = "0.22.0", features = [ "simd-stable", "wasm-bindgen" ] } # "debug-render-3d
 bevy-inspector-egui = "0.20.0" 
 bevy_infinite_grid = { git = "https://github.com/ForesightMiningSoftwareCorporation/bevy_infinite_grid", branch = "main" }
+
+# Enable a small amount of optimization in debug mode
+[profile.dev]
+opt-level = 1
+
+# Enable high optimizations for dependencies (incl. Bevy), but not for our code:
+[profile.dev.package."*"]
+opt-level = 3
