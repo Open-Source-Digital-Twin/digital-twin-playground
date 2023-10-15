@@ -16,11 +16,10 @@ use bevy::{
 
 #[cfg(feature = "animation")]
 mod animation_plugin;
-mod camera_controller_plugin;
 mod morph_viewer_plugin;
 mod scene_viewer_plugin;
 
-use camera_controller_plugin::{CameraController, CameraControllerPlugin};
+use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
 use morph_viewer_plugin::MorphViewerPlugin;
 use scene_viewer_plugin::{SceneHandle, SceneViewerPlugin};
 
@@ -44,7 +43,7 @@ fn main() {
                     .unwrap_or_else(|_| ".".to_string()),
                 watch_for_changes: ChangeWatcher::with_delay(Duration::from_millis(200)),
             }),
-        CameraControllerPlugin,
+        PanOrbitCameraPlugin,
         SceneViewerPlugin,
         MorphViewerPlugin,
     ))
@@ -112,39 +111,21 @@ fn setup_scene_after_load(
             max = max.max(aabb.max());
         }
 
-        let size = (max - min).length();
-        let aabb = Aabb::from_min_max(Vec3::from(min), Vec3::from(max));
-
-        info!("Spawning a controllable 3D perspective camera");
-        let mut projection = PerspectiveProjection::default();
-        projection.far = projection.far.max(size * 10.0);
-
-        let camera_controller = CameraController::default();
-
         // Display the controls of the scene viewer
-        info!("{}", camera_controller);
         info!("{}", *scene_handle);
 
         commands.spawn((
             Camera3dBundle {
-                projection: projection.into(),
-                transform: Transform::from_translation(
-                    Vec3::from(aabb.center) + size * Vec3::new(0.5, 0.25, 0.5),
-                )
-                .looking_at(Vec3::from(aabb.center), Vec3::Y),
-                camera: Camera {
-                    is_active: false,
-                    ..default()
-                },
+                transform: Transform::from_translation(Vec3::new(10.0, 10.0, 10.0)),
                 ..default()
             },
+            PanOrbitCamera::default(),
             EnvironmentMapLight {
                 diffuse_map: asset_server
                     .load("assets/environment_maps/pisa_diffuse_rgb9e5_zstd.ktx2"),
                 specular_map: asset_server
                     .load("assets/environment_maps/pisa_specular_rgb9e5_zstd.ktx2"),
             },
-            camera_controller,
         ));
 
         // Spawn a default light if the scene does not have one
