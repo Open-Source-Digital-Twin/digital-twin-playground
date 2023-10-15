@@ -11,8 +11,6 @@ use bevy::{
 use std::f32::consts::*;
 use std::fmt;
 
-use super::camera_controller_plugin::*;
-
 #[derive(Resource)]
 pub struct SceneHandle {
     pub gltf_handle: Handle<Gltf>,
@@ -66,16 +64,13 @@ pub struct SceneViewerPlugin;
 
 impl Plugin for SceneViewerPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<CameraTracker>()
-            .add_systems(PreUpdate, scene_load_check)
-            .add_systems(
-                Update,
-                (
-                    update_lights,
-                    camera_tracker,
-                    toggle_bounding_boxes.run_if(input_just_pressed(KeyCode::B)),
-                ),
-            );
+        app.add_systems(PreUpdate, scene_load_check).add_systems(
+            Update,
+            (
+                update_lights,
+                toggle_bounding_boxes.run_if(input_just_pressed(KeyCode::B)),
+            ),
+        );
     }
 }
 
@@ -162,73 +157,6 @@ fn update_lights(
                 time.elapsed_seconds() * PI / 15.0,
                 -FRAC_PI_4,
             );
-        }
-    }
-}
-
-#[derive(Resource, Default)]
-struct CameraTracker {
-    active_index: Option<usize>,
-    cameras: Vec<Entity>,
-}
-
-impl CameraTracker {
-    fn track_camera(&mut self, entity: Entity) -> bool {
-        self.cameras.push(entity);
-        if self.active_index.is_none() {
-            self.active_index = Some(self.cameras.len() - 1);
-            true
-        } else {
-            false
-        }
-    }
-
-    fn active_camera(&self) -> Option<Entity> {
-        self.active_index.map(|i| self.cameras[i])
-    }
-
-    fn set_next_active(&mut self) -> Option<Entity> {
-        let active_index = self.active_index?;
-        let new_i = (active_index + 1) % self.cameras.len();
-        self.active_index = Some(new_i);
-        Some(self.cameras[new_i])
-    }
-}
-
-#[allow(clippy::type_complexity)]
-fn camera_tracker(
-    mut camera_tracker: ResMut<CameraTracker>,
-    keyboard_input: Res<Input<KeyCode>>,
-    mut queries: ParamSet<(
-        Query<(Entity, &mut Camera), (Added<Camera>, Without<CameraController>)>,
-        Query<(Entity, &mut Camera), (Added<Camera>, With<CameraController>)>,
-        Query<&mut Camera>,
-    )>,
-) {
-    // track added scene camera entities first, to ensure they are preferred for the
-    // default active camera
-    for (entity, mut camera) in queries.p0().iter_mut() {
-        camera.is_active = camera_tracker.track_camera(entity);
-    }
-
-    // iterate added custom camera entities second
-    for (entity, mut camera) in queries.p1().iter_mut() {
-        camera.is_active = camera_tracker.track_camera(entity);
-    }
-
-    if keyboard_input.just_pressed(KeyCode::C) {
-        // disable currently active camera
-        if let Some(e) = camera_tracker.active_camera() {
-            if let Ok(mut camera) = queries.p2().get_mut(e) {
-                camera.is_active = false;
-            }
-        }
-
-        // enable next active camera
-        if let Some(e) = camera_tracker.set_next_active() {
-            if let Ok(mut camera) = queries.p2().get_mut(e) {
-                camera.is_active = true;
-            }
         }
     }
 }
