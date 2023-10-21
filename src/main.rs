@@ -74,7 +74,7 @@ fn parse_scene(scene_path: String) -> (String, usize) {
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     let scene_path = std::env::args()
         .nth(1)
-        .unwrap_or_else(|| "assets/rotary_pendulum.glb".to_string());
+        .unwrap_or_else(|| "3d-models/rotary-inverted-pendulum/rotary_pendulum.glb".to_string());
     info!("Loading {}", scene_path);
     let (file_path, scene_index) = parse_scene(scene_path);
     commands.insert_resource(SceneHandle::new(asset_server.load(file_path), scene_index));
