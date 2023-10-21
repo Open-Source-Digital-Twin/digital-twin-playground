@@ -190,9 +190,6 @@ fn add_colliders(
         if let Some(collider) = collider {
             commands
                 .entity(entity)
-                .insert(RigidBody::Dynamic)
-                .insert(AdditionalMassProperties::Mass(1.0))
-                .insert(GravityScale(1.0))
                 .insert(collider);
             info!("Added collider to entity {:?}", entity);
             scene_handle.has_colliders = true;
