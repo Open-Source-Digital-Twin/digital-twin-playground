@@ -1,18 +1,29 @@
 use bevy::prelude::*;
-use bevy_rapier3d::{prelude::*, rapier::prelude::Vector};
+use bevy_rapier3d::prelude::*;
 
 pub struct EmbeddedModelPlugin;
 
 impl Plugin for EmbeddedModelPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, add_rotary_interved_pendulum);
+        app.init_resource::<Motor>()
+            .add_systems(Startup, add_rotary_interved_pendulum)
+            .add_systems(
+                Update,
+                control_motor.run_if(resource_changed::<Input<KeyCode>>()),
+            );
     }
+}
+
+#[derive(Resource, Default)]
+struct Motor {
+    joint_entity: Option<Entity>,
 }
 
 fn add_rotary_interved_pendulum(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
+    mut motor: ResMut<Motor>,
 ) {
     const GROUND_THICKNESS: f32 = 0.01;
     const GROUND_SIDE_SIZE: f32 = 100.0;
@@ -48,16 +59,18 @@ fn add_rotary_interved_pendulum(
     let fixed_joint_1 =
         FixedJointBuilder::new().local_anchor2(Vec3::new(0.0, CUBE_SIZE / 2.0, 0.0));
 
-    commands.entity(ground).with_children(|children| {
-        children.spawn(ImpulseJoint::new(cube_1, fixed_joint_1));
-    });
+    commands
+        .entity(ground)
+        .insert(ImpulseJoint::new(cube_1, fixed_joint_1));
 
     let cylinder_1 = commands
         .spawn((
             RigidBody::Dynamic,
             Collider::cylinder(CYLINDER_HEIGHT / 2.0, CYLINDER_RADIUS),
             ColliderMassProperties::Mass(1.0),
-            LockedAxes::TRANSLATION_LOCKED | LockedAxes::ROTATION_LOCKED_X | LockedAxes::ROTATION_LOCKED_Z,
+            LockedAxes::TRANSLATION_LOCKED
+                | LockedAxes::ROTATION_LOCKED_X
+                | LockedAxes::ROTATION_LOCKED_Z,
             PbrBundle {
                 mesh: meshes.add(Mesh::from(shape::Cylinder {
                     radius: CYLINDER_RADIUS,
@@ -73,12 +86,14 @@ fn add_rotary_interved_pendulum(
 
     let revolute_joint_1 = RevoluteJointBuilder::new(Vec3::Y)
         .local_anchor1(Vec3::new(0.0, CUBE_SIZE / 2.0, 0.0))
-        .local_anchor2(Vec3::new(0.0, CUBE_SIZE + CYLINDER_HEIGHT / 2.0, 0.0))
-        .motor_velocity(1000.0, 0.5);
+        .local_anchor2(Vec3::new(0.0, CUBE_SIZE + CYLINDER_HEIGHT / 2.0, 0.0));
 
-    commands.entity(cube_1).with_children(|children| {
-        children.spawn(ImpulseJoint::new(cylinder_1, revolute_joint_1));
-    });
+    let rev = commands
+        .entity(cube_1)
+        .insert(ImpulseJoint::new(cylinder_1, revolute_joint_1))
+        .id();
+
+    motor.joint_entity = Some(rev);
 
     let cube_2 = commands
         .spawn((
@@ -104,9 +119,9 @@ fn add_rotary_interved_pendulum(
         0.0,
     ));
 
-    commands.entity(cylinder_1).with_children(|children| {
-        children.spawn(ImpulseJoint::new(cube_2, fixed_joint_2));
-    });
+    commands
+        .entity(cylinder_1)
+        .insert(ImpulseJoint::new(cube_2, fixed_joint_2));
 
     let cylinder_2 = commands
         .spawn((
@@ -135,9 +150,9 @@ fn add_rotary_interved_pendulum(
         .local_basis2(Quat::from_rotation_x(std::f32::consts::PI / 2.0))
         .local_anchor2(Vec3::new(0.0, 0.0, CUBE_SIZE / 2.0 + CYLINDER_HEIGHT / 2.0));
 
-    commands.entity(cube_2).with_children(|children| {
-        children.spawn(ImpulseJoint::new(cylinder_2, fixed_joint_3));
-    });
+    commands
+        .entity(cube_2)
+        .insert(ImpulseJoint::new(cylinder_2, fixed_joint_3));
 
     let cube_3 = commands
         .spawn((
@@ -157,18 +172,45 @@ fn add_rotary_interved_pendulum(
         ))
         .id();
 
-    let revolute_joint_2 = RevoluteJointBuilder::new(Vec3::Y)
-        .local_anchor2(Vec3::new(
-            0.0,
-            -(CUBE_SIZE / 2.0  + CYLINDER_HEIGHT / 2.0) ,
-            0.0,
-        ));
+    let revolute_joint_2 = RevoluteJointBuilder::new(Vec3::Y).local_anchor2(Vec3::new(
+        0.0,
+        -(CUBE_SIZE / 2.0 + CYLINDER_HEIGHT / 2.0),
+        0.0,
+    ));
 
-    commands.entity(cube_3).with_children(|children| {
-        children.spawn(ImpulseJoint::new(cylinder_2, revolute_joint_2));
-    });
+    commands
+        .entity(cube_3)
+        .insert(ImpulseJoint::new(cylinder_2, revolute_joint_2));
 }
 
-// fn add_ground(mut commands: Commands) {
-
-// }
+fn control_motor(
+    key: Res<Input<KeyCode>>,
+    motor: ResMut<Motor>,
+    mut query: Query<&mut ImpulseJoint>,
+) {
+    match motor.joint_entity {
+        Some(entity) => {
+            let velocity = 10.0;
+            let factor = 1000.0;
+            let mut joint = query.get_mut(entity).unwrap();
+            if key.just_pressed(KeyCode::Left) {
+                debug!("Left");
+                joint
+                    .data
+                    .as_revolute_mut()
+                    .unwrap()
+                    .set_motor_velocity(velocity, factor);
+            } else if key.just_pressed(KeyCode::Right) {
+                debug!("Right");
+                joint
+                    .data
+                    .as_revolute_mut()
+                    .unwrap()
+                    .set_motor_velocity(-velocity, factor);
+            }
+        }
+        _ => {
+            warn!("No joint entity");
+        }
+    }
+}
