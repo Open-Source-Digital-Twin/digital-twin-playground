@@ -1,3 +1,6 @@
+//! This module is an experiment of how to use ECS with Rapier3D.
+//! It's main purpose is to check if it's possible to use physics with a model embedded in the scene.
+
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
@@ -16,9 +19,11 @@ impl Plugin for EmbeddedModelPlugin {
 
 #[derive(Resource, Default)]
 struct Motor {
+    /// The entity of the joint. It's used to control the motor.
     joint_entity: Option<Entity>,
 }
 
+/// This system is used to create the scene with embedded model.
 fn add_rotary_interved_pendulum(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -183,6 +188,7 @@ fn add_rotary_interved_pendulum(
         .insert(ImpulseJoint::new(cylinder_2, revolute_joint_2));
 }
 
+/// This system is used to control the motor.
 fn control_motor(
     key: Res<Input<KeyCode>>,
     motor: ResMut<Motor>,
