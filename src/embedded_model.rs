@@ -9,7 +9,13 @@ pub struct EmbeddedModelPlugin;
 impl Plugin for EmbeddedModelPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<Motor>()
+            // .add_systems(PreStartup, |mut rapier_config: ResMut<RapierConfiguration>| {
+            //     rapier_config.physics_pipeline_active = false;
+            // })
             .add_systems(Startup, add_rotary_interved_pendulum)
+            // .add_systems(PostStartup, |mut rapier_config: ResMut<RapierConfiguration>| {
+            //     rapier_config.physics_pipeline_active = true;
+            // })
             .add_systems(
                 Update,
                 control_motor.run_if(resource_changed::<Input<KeyCode>>()),
@@ -132,6 +138,7 @@ fn add_rotary_interved_pendulum(
         .spawn((
             RigidBody::Dynamic,
             Collider::cylinder(CYLINDER_HEIGHT / 2.0, CYLINDER_RADIUS),
+            LockedAxes::TRANSLATION_LOCKED_Y,
             ColliderMassProperties::Mass(1.0),
             PbrBundle {
                 mesh: meshes.add(Mesh::from(shape::Cylinder {
@@ -186,6 +193,40 @@ fn add_rotary_interved_pendulum(
     commands
         .entity(cube_3)
         .insert(ImpulseJoint::new(cylinder_2, revolute_joint_2));
+
+    let cylinder_3 = commands
+        .spawn((
+            RigidBody::Dynamic,
+            Collider::cylinder(CYLINDER_HEIGHT / 2.0, CYLINDER_RADIUS),
+            ColliderMassProperties::Mass(1.0),
+            PbrBundle {
+                mesh: meshes.add(Mesh::from(shape::Cylinder {
+                    radius: CYLINDER_RADIUS,
+                    height: CYLINDER_HEIGHT,
+                    ..Default::default()
+                })),
+                material: materials.add(Color::GRAY.into()),
+                transform: Transform::from_xyz(
+                    0.0,
+                    CUBE_SIZE + CYLINDER_HEIGHT / 2.0,
+                    CUBE_SIZE / 2.0 + CYLINDER_HEIGHT + CUBE_SIZE / 2.0,
+                ),
+                ..Default::default()
+            },
+        ))
+        .id();
+
+    let fixed_joint_3 = FixedJointBuilder::new()
+        .local_basis2(Quat::from_rotation_x(std::f32::consts::PI / 2.0))
+        .local_anchor2(Vec3::new(
+            0.0,
+            -(CUBE_SIZE / 2.0 + CYLINDER_HEIGHT / 2.0),
+            0.0,
+        ));
+
+    commands
+        .entity(cylinder_3)
+        .insert(ImpulseJoint::new(cube_3, fixed_joint_3));
 }
 
 /// This system is used to control the motor.
@@ -197,7 +238,7 @@ fn control_motor(
     match motor.joint_entity {
         Some(entity) => {
             let velocity = 10.0;
-            let factor = 1000.0;
+            let factor = 10000.0;
             let mut joint = query.get_mut(entity).unwrap();
             if key.just_pressed(KeyCode::Left) {
                 debug!("Left");
@@ -213,6 +254,14 @@ fn control_motor(
                     .as_revolute_mut()
                     .unwrap()
                     .set_motor_velocity(-velocity, factor);
+            } 
+            else if key.just_pressed(KeyCode::Down){
+                debug!("Stop");
+                joint
+                    .data
+                    .as_revolute_mut()
+                    .unwrap()
+                    .set_motor_velocity(0.0, factor);
             }
         }
         _ => {
