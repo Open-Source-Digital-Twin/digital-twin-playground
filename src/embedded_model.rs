@@ -254,8 +254,7 @@ fn control_motor(
                     .as_revolute_mut()
                     .unwrap()
                     .set_motor_velocity(-velocity, factor);
-            } 
-            else if key.just_pressed(KeyCode::Down){
+            } else if key.just_pressed(KeyCode::Down) {
                 debug!("Stop");
                 joint
                     .data
