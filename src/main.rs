@@ -6,25 +6,27 @@
 //! With no arguments it will load the `rotary_pendulum` glTF model from the repository assets subdirectory.
 
 use bevy::{
+    asset::ChangeWatcher,
     math::Vec3A,
     prelude::*,
     render::primitives::{Aabb, Sphere},
+    utils::Duration,
     window::WindowPlugin,
 };
 
 use bevy_infinite_grid::{InfiniteGrid, InfiniteGridBundle, InfiniteGridPlugin};
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_rapier3d::prelude::*;
-#[cfg(feature = "blender")]
-mod scene_viewer_plugin;
 #[cfg(feature = "embedded-model")]
 mod embedded_model;
+#[cfg(feature = "blender")]
+mod scene_viewer_plugin;
 
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
-#[cfg(feature = "blender")]
-use scene_viewer_plugin::{SceneHandle, SceneViewerPlugin};
 #[cfg(feature = "embedded-model")]
 use embedded_model::EmbeddedModelPlugin;
+#[cfg(feature = "blender")]
+use scene_viewer_plugin::{SceneHandle, SceneViewerPlugin};
 
 fn main() {
     let mut app = App::new();
@@ -42,8 +44,9 @@ fn main() {
                 ..default()
             })
             .set(AssetPlugin {
-                file_path: std::env::var("CARGO_MANIFEST_DIR").unwrap_or_else(|_| ".".to_string()),
-                ..default()
+                asset_folder: std::env::var("CARGO_MANIFEST_DIR")
+                    .unwrap_or_else(|_| ".".to_string()),
+                watch_for_changes: ChangeWatcher::with_delay(Duration::from_millis(200)),
             }),
         PanOrbitCameraPlugin,
         #[cfg(feature = "blender")]
@@ -59,8 +62,6 @@ fn main() {
 
     #[cfg(feature = "blender")]
     app.add_systems(PreUpdate, setup_scene_after_load);
-
-
 
     app.run();
 }
