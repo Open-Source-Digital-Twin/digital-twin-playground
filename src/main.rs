@@ -5,13 +5,12 @@
 //! In case of multiple scenes, you can select which to display by adapting the file path: `/path/to/model.gltf#Scene1`.
 //! With no arguments it will load the `rotary_pendulum` glTF model from the repository assets subdirectory.
 
+use bevy::{asset::ChangeWatcher, prelude::*, utils::Duration, window::WindowPlugin};
+
+#[cfg(feature = "blender")]
 use bevy::{
-    asset::ChangeWatcher,
     math::Vec3A,
-    prelude::*,
     render::primitives::{Aabb, Sphere},
-    utils::Duration,
-    window::WindowPlugin,
 };
 
 use bevy_infinite_grid::{InfiniteGrid, InfiniteGridBundle, InfiniteGridPlugin};
@@ -66,7 +65,7 @@ fn main() {
     app.run();
 }
 
-fn parse_scene(scene_path: String) -> (String, usize) {
+fn _parse_scene(scene_path: String) -> (String, usize) {
     if scene_path.contains('#') {
         let gltf_and_scene = scene_path.split('#').collect::<Vec<_>>();
         if let Some((last, path)) = gltf_and_scene.split_last() {
@@ -107,7 +106,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn(InfiniteGridBundle {
         grid: InfiniteGrid {
             // shadow_color: None,
-            ..default()
+            // ..default()
         },
         ..default()
     });
