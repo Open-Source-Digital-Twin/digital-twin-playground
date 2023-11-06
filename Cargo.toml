@@ -8,4 +8,4 @@ authors = ["Caio Piccirillo <caiopiccirillo@gmail.com>"]
 
 [dependencies]
 bevy = "0.12.0"
-bevy_panorbit_camera = "0.8.0"
+bevy_panorbit_camera = "0.9.0"
