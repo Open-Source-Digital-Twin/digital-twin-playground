@@ -37,8 +37,7 @@ fn main() {
                 ..default()
             })
             .set(AssetPlugin {
-                file_path: std::env::var("CARGO_MANIFEST_DIR")
-                    .unwrap_or_else(|_| ".".to_string()),
+                file_path: std::env::var("CARGO_MANIFEST_DIR").unwrap_or_else(|_| ".".to_string()),
                 ..default()
             }),
         PanOrbitCameraPlugin,
