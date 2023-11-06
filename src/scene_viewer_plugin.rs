@@ -188,9 +188,7 @@ fn add_colliders(
         let _material = materials.get_mut(material_handle).unwrap();
         let collider = Collider::from_bevy_mesh(mesh, &ComputedColliderShape::TriMesh);
         if let Some(collider) = collider {
-            commands
-                .entity(entity)
-                .insert(collider);
+            commands.entity(entity).insert(collider);
             info!("Added collider to entity {:?}", entity);
             scene_handle.has_colliders = true;
         } else {
