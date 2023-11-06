@@ -11,8 +11,9 @@ This project is a virtual environment for testing different motion control algor
 
 ## Getting Started
 1. Install Rust.
-2. Run `cargo install wasm-server-runner`
-3. Add this to your `~/.cargo/config.toml` (**not** the `Cargo.toml` of your project!):
+2. Run `rustup target add wasm32-unknown-unknown` to add the WebAssembly target.
+3. Run `cargo install wasm-server-runner`
+4. Add this to your `~/.cargo/config.toml` (**not** the `Cargo.toml` of your project!):
     ```toml
     [target.wasm32-unknown-unknown]
     runner = "wasm-server-runner"
@@ -22,10 +23,9 @@ This project is a virtual environment for testing different motion control algor
 6. Run `cargo run --target wasm32-unknown-unknown` to start the project.
 
 ## Controls
-* W - go forward
-* A - go to the left
-* D - go to the right
-* S - go backward
+* Left mouse button - rotate camera
+* Right mouse button - pan camera
+* Mouse wheel - zoom camera
 * B - enable/disable frames for elements
 * L - start/stop animation
 * U - enable/disable shadows
