@@ -12,14 +12,19 @@ use bevy::{
     window::WindowPlugin,
 };
 
-#[cfg(feature = "animation")]
-mod animation_plugin;
-mod morph_viewer_plugin;
+use bevy_infinite_grid::{InfiniteGrid, InfiniteGridBundle, InfiniteGridPlugin};
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use bevy_rapier3d::prelude::*;
+#[cfg(feature = "blender")]
 mod scene_viewer_plugin;
+#[cfg(feature = "embedded-model")]
+mod embedded_model;
 
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
-use morph_viewer_plugin::MorphViewerPlugin;
+#[cfg(feature = "blender")]
 use scene_viewer_plugin::{SceneHandle, SceneViewerPlugin};
+#[cfg(feature = "embedded-model")]
+use embedded_model::EmbeddedModelPlugin;
 
 fn main() {
     let mut app = App::new();
@@ -41,14 +46,21 @@ fn main() {
                 ..default()
             }),
         PanOrbitCameraPlugin,
+        #[cfg(feature = "blender")]
         SceneViewerPlugin,
-        MorphViewerPlugin,
+        #[cfg(feature = "embedded-model")]
+        EmbeddedModelPlugin,
+        WorldInspectorPlugin::new(),
+        RapierPhysicsPlugin::<NoUserData>::default(),
+        RapierDebugRenderPlugin::default(),
+        InfiniteGridPlugin,
     ))
-    .add_systems(Startup, setup)
-    .add_systems(PreUpdate, setup_scene_after_load);
+    .add_systems(Startup, setup);
 
-    #[cfg(feature = "animation")]
-    app.add_plugins(animation_plugin::AnimationManipulationPlugin);
+    #[cfg(feature = "blender")]
+    app.add_systems(PreUpdate, setup_scene_after_load);
+
+
 
     app.run();
 }
@@ -68,16 +80,39 @@ fn parse_scene(scene_path: String) -> (String, usize) {
     (scene_path, 0)
 }
 
+#[cfg(feature = "blender")]
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     let scene_path = std::env::args()
         .nth(1)
-        .unwrap_or_else(|| "assets/rotary_pendulum.glb".to_string());
+        .unwrap_or_else(|| "3d-models/rotary-inverted-pendulum/rotary_pendulum.glb".to_string());
     info!("Loading {}", scene_path);
     let (file_path, scene_index) = parse_scene(scene_path);
-
     commands.insert_resource(SceneHandle::new(asset_server.load(file_path), scene_index));
 }
 
+fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+    commands.spawn((
+        Camera3dBundle {
+            transform: Transform::from_translation(Vec3::new(10.0, 10.0, 10.0)),
+            ..default()
+        },
+        PanOrbitCamera::default(),
+        EnvironmentMapLight {
+            diffuse_map: asset_server.load("assets/environment_maps/pisa_diffuse_rgb9e5_zstd.ktx2"),
+            specular_map: asset_server
+                .load("assets/environment_maps/pisa_specular_rgb9e5_zstd.ktx2"),
+        },
+    ));
+    commands.spawn(InfiniteGridBundle {
+        grid: InfiniteGrid {
+            // shadow_color: None,
+            ..default()
+        },
+        ..default()
+    });
+}
+
+#[cfg(feature = "blender")]
 fn setup_scene_after_load(
     mut commands: Commands,
     mut setup: Local<bool>,
@@ -138,5 +173,13 @@ fn setup_scene_after_load(
 
             scene_handle.has_light = true;
         }
+
+        commands.spawn(InfiniteGridBundle {
+            grid: InfiniteGrid {
+                // shadow_color: None,
+                ..default()
+            },
+            ..default()
+        });
     }
 }

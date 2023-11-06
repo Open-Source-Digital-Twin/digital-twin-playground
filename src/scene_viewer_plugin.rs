@@ -7,6 +7,9 @@ use bevy::{
     asset::LoadState, gltf::Gltf, input::common_conditions::input_just_pressed, prelude::*,
     scene::InstanceId,
 };
+use bevy_rapier3d::prelude::{
+    AdditionalMassProperties, Collider, ComputedColliderShape, GravityScale, RigidBody,
+};
 
 use std::f32::consts::*;
 use std::fmt;
@@ -18,6 +21,8 @@ pub struct SceneHandle {
     instance_id: Option<InstanceId>,
     pub is_loaded: bool,
     pub has_light: bool,
+    pub has_colliders: bool,
+    pub has_rigid_bodies: bool,
 }
 
 impl SceneHandle {
@@ -28,6 +33,8 @@ impl SceneHandle {
             instance_id: None,
             is_loaded: false,
             has_light: false,
+            has_colliders: false,
+            has_rigid_bodies: false,
         }
     }
 }
@@ -64,13 +71,17 @@ pub struct SceneViewerPlugin;
 
 impl Plugin for SceneViewerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(PreUpdate, scene_load_check).add_systems(
-            Update,
-            (
-                update_lights,
-                toggle_bounding_boxes.run_if(input_just_pressed(KeyCode::B)),
-            ),
-        );
+        app.add_systems(PreUpdate, scene_load_check)
+            .add_systems(Startup, add_ground)
+            .add_systems(
+                Update,
+                (
+                    update_lights,
+                    toggle_bounding_boxes.run_if(input_just_pressed(KeyCode::B)),
+                ),
+            )
+            .add_systems(PostUpdate, add_colliders)
+            .add_systems(PostUpdate, add_rigid_bodies);
     }
 }
 
@@ -159,4 +170,80 @@ fn update_lights(
             );
         }
     }
+}
+
+fn add_colliders(
+    mut commands: Commands,
+    mut scene_handle: ResMut<SceneHandle>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+    mut query: Query<(Entity, &Handle<Mesh>, &Handle<StandardMaterial>)>,
+) {
+    if scene_handle.has_colliders {
+        return;
+    }
+
+    for (entity, mesh_handle, material_handle) in &mut query {
+        let mesh = meshes.get_mut(mesh_handle).unwrap();
+        let _material = materials.get_mut(material_handle).unwrap();
+        let collider = Collider::from_bevy_mesh(mesh, &ComputedColliderShape::TriMesh);
+        if let Some(collider) = collider {
+            commands
+                .entity(entity)
+                .insert(collider);
+            info!("Added collider to entity {:?}", entity);
+            scene_handle.has_colliders = true;
+        } else {
+            warn!("Failed to create collider for entity {:?}", entity);
+        }
+    }
+    if scene_handle.has_colliders {
+        info!("Added colliders to scene");
+    }
+}
+
+fn add_rigid_bodies(
+    mut commands: Commands,
+    mut scene_handle: ResMut<SceneHandle>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut query: Query<(Entity, &Handle<Mesh>)>,
+) {
+    if scene_handle.has_rigid_bodies {
+        return;
+    }
+
+    for (entity, mesh_handle) in &mut query {
+        let mesh = meshes.get_mut(mesh_handle);
+        if let Some(_mesh) = mesh {
+            commands
+                .entity(entity)
+                .insert(RigidBody::Dynamic)
+                .insert(AdditionalMassProperties::Mass(1.0))
+                .insert(GravityScale(1.0));
+            info!("Added rigid body to entity {:?}", entity);
+            scene_handle.has_rigid_bodies = true;
+        } else {
+            warn!("Failed to create rigid body for entity {:?}", entity);
+        }
+    }
+    if scene_handle.has_rigid_bodies {
+        info!("Added rigid bodies to scene");
+    }
+}
+
+fn add_ground(mut commands: Commands) {
+    const GROUND_THICKNESS: f32 = 0.01;
+    const GROUND_SIDE_SIZE: f32 = 100.0;
+
+    commands
+        .spawn(Collider::cuboid(
+            GROUND_SIDE_SIZE,
+            GROUND_THICKNESS,
+            GROUND_SIDE_SIZE,
+        ))
+        .insert(TransformBundle::from(Transform::from_xyz(
+            0.0,
+            -GROUND_THICKNESS,
+            0.0,
+        )));
 }
