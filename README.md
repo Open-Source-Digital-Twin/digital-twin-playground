@@ -18,7 +18,8 @@ This project is a virtual environment for testing different motion control algor
     [target.wasm32-unknown-unknown]
     runner = "wasm-server-runner"
     ```
-5. Clone this repository.
+4. Clone this repository.
+5. Run `git submodule update --init`
 6. Run `cargo run --target wasm32-unknown-unknown` to start the project.
 
 ## Controls
