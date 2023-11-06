@@ -4,6 +4,8 @@ This project is a virtual environment for testing different motion control algor
 
 > :warning: This project is in alpha stage and there is still work in progress.
 
+[pendulum.webm](https://github.com/Open-Source-Digital-Twin/motion-control-playground/assets/54245866/4d3ade7f-2c11-4636-b72e-9c02252f964d)
+
 ## Features
 * Import 3D models from Blender
 * Control the motion of the models using different controllers, such as PID, fuzzy, and adaptive control (or any other creative strategies)
