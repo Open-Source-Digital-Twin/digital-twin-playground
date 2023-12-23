@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,12 +29,15 @@ jobs:
             ~/.cargo/git
             ~/.cargo/registry
             target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-deploy-${{ hashFiles('**/Cargo.lock') }}
 
-      - name: Install dependencies
-        run: |
-          cargo install trunk || true \
-            && rustup target add wasm32-unknown-unknown
+      - name: Install stable toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Install trunk
+        run: cargo install trunk 
 
       - name: Build the Rust WASM app and all of its assets
         run: trunk build --public-url ${{ github.event.repository.name }}
@@ -55,7 +58,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
