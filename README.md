@@ -13,16 +13,11 @@ This project is a virtual environment for testing different motion control algor
 
 ## Getting Started
 1. Install Rust.
-2. Run `rustup target add wasm32-unknown-unknown` to add the WebAssembly target.
-3. Run `cargo install wasm-server-runner`
-4. Add this to your `~/.cargo/config.toml` (**not** the `Cargo.toml` of your project!):
-    ```toml
-    [target.wasm32-unknown-unknown]
-    runner = "wasm-server-runner"
-    ```
-4. Clone this repository.
-5. Run `git submodule update --init`
-6. Run `cargo run --target wasm32-unknown-unknown` to start the project.
+2. Clone this repository.
+3. Run `git submodule update --init`
+4. Install [just](https://github.com/casey/just) to facilitate command handling (e.g., `cargo install just`).
+5. (Optional) Run `just setup-wasm` to setup your environment for building the WebAssembly version of the project.
+6. Run `just run-linux` or `just run-wasm` to start the project.
 
 ## Controls
 * Left mouse button - rotate camera
