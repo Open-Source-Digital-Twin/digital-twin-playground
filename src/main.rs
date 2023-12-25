@@ -5,7 +5,7 @@
 //! In case of multiple scenes, you can select which to display by adapting the file path: `/path/to/model.gltf#Scene1`.
 //! With no arguments it will load the `rotary_pendulum` glTF model from the repository assets subdirectory.
 
-use bevy::{asset::ChangeWatcher, prelude::*, utils::Duration, window::WindowPlugin};
+use bevy::{prelude::*, window::WindowPlugin};
 
 #[cfg(feature = "blender")]
 use bevy::{
@@ -13,7 +13,7 @@ use bevy::{
     render::primitives::{Aabb, Sphere},
 };
 
-use bevy_infinite_grid::{InfiniteGrid, InfiniteGridBundle, InfiniteGridPlugin};
+// use bevy_infinite_grid::{InfiniteGrid, InfiniteGridBundle, InfiniteGridPlugin};
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_rapier3d::prelude::*;
 #[cfg(feature = "embedded-model")]
@@ -43,9 +43,8 @@ fn main() {
                 ..default()
             })
             .set(AssetPlugin {
-                asset_folder: std::env::var("CARGO_MANIFEST_DIR")
-                    .unwrap_or_else(|_| ".".to_string()),
-                watch_for_changes: ChangeWatcher::with_delay(Duration::from_millis(200)),
+                file_path: std::env::var("CARGO_MANIFEST_DIR").unwrap_or_else(|_| ".".to_string()),
+                ..default()
             }),
         PanOrbitCameraPlugin,
         #[cfg(feature = "blender")]
@@ -55,7 +54,7 @@ fn main() {
         WorldInspectorPlugin::new(),
         RapierPhysicsPlugin::<NoUserData>::default(),
         RapierDebugRenderPlugin::default(),
-        InfiniteGridPlugin,
+        // InfiniteGridPlugin,
     ))
     .add_systems(Startup, setup);
 
@@ -103,13 +102,13 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                 .load("assets/environment_maps/pisa_specular_rgb9e5_zstd.ktx2"),
         },
     ));
-    commands.spawn(InfiniteGridBundle {
-        grid: InfiniteGrid {
-            // shadow_color: None,
-            // ..default()
-        },
-        ..default()
-    });
+    // commands.spawn(InfiniteGridBundle {
+    //     grid: InfiniteGrid {
+    //         // shadow_color: None,
+    //         // ..default()
+    //     },
+    //     ..default()
+    // });
 }
 
 #[cfg(feature = "blender")]
