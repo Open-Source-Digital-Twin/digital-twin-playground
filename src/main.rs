@@ -21,11 +21,15 @@ mod embedded_model;
 #[cfg(feature = "blender")]
 mod scene_viewer_plugin;
 
+mod config_plugin;
+
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
 #[cfg(feature = "embedded-model")]
 use embedded_model::EmbeddedModelPlugin;
 #[cfg(feature = "blender")]
 use scene_viewer_plugin::{SceneHandle, SceneViewerPlugin};
+
+use config_plugin::ConfigPlugin;
 
 fn main() {
     let mut app = App::new();
@@ -54,6 +58,7 @@ fn main() {
         WorldInspectorPlugin::new(),
         RapierPhysicsPlugin::<NoUserData>::default(),
         RapierDebugRenderPlugin::default(),
+        ConfigPlugin,
         // InfiniteGridPlugin,
     ))
     .add_systems(Startup, setup);
