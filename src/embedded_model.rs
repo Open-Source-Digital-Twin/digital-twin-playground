@@ -2,7 +2,10 @@
 //! It's main purpose is to check if it's possible to use physics with a model embedded in the scene.
 
 use bevy::prelude::*;
+use bevy_persistent::Persistent;
 use bevy_rapier3d::prelude::*;
+
+use crate::config_plugin::KeyBindings;
 
 pub struct EmbeddedModelPlugin;
 
@@ -234,21 +237,20 @@ fn control_motor(
     key: Res<Input<KeyCode>>,
     motor: ResMut<Motor>,
     mut query: Query<&mut ImpulseJoint>,
+    key_bindings: Res<Persistent<KeyBindings>>,
 ) {
     match motor.joint_entity {
         Some(entity) => {
             let velocity = 10.0;
             let factor = 10000.0;
             let mut joint = query.get_mut(entity).unwrap();
-            if key.just_pressed(KeyCode::Left) {
-                debug!("Left");
+            if key.just_pressed(key_bindings.rotate_clockwise) {
                 joint
                     .data
                     .as_revolute_mut()
                     .unwrap()
                     .set_motor_velocity(velocity, factor);
-            } else if key.just_pressed(KeyCode::Right) {
-                debug!("Right");
+            } else if key.just_pressed(key_bindings.rotate_counter_clockwise) {
                 joint
                     .data
                     .as_revolute_mut()
