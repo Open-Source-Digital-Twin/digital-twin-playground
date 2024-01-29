@@ -37,7 +37,7 @@ jobs:
           targets: wasm32-unknown-unknown
 
       - name: Install trunk
-        run: cargo install trunk 
+        run: cargo install trunk || true
 
       - name: Build the Rust WASM app and all of its assets
         run: trunk build --public-url ${{ github.event.repository.name }}
