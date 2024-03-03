@@ -33,8 +33,8 @@ fn setup(mut commands: Commands) {
             .format(StorageFormat::Json)
             .path(config_dir.join("key_bindings.json"))
             .default(KeyBindings {
-                rotate_clockwise: KeyCode::Left,
-                rotate_counter_clockwise: KeyCode::Right,
+                rotate_clockwise: KeyCode::ArrowLeft,
+                rotate_counter_clockwise: KeyCode::ArrowRight,
             })
             .build()
             .expect("Failed to initialize key bindings."),
