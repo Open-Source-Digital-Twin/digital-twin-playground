@@ -21,7 +21,7 @@ impl Plugin for EmbeddedModelPlugin {
             // })
             .add_systems(
                 Update,
-                control_motor.run_if(resource_changed::<Input<KeyCode>>()),
+                control_motor.run_if(resource_changed::<ButtonInput<KeyCode>>),
             );
     }
 }
@@ -63,7 +63,7 @@ fn add_rotary_interved_pendulum(
             ColliderMassProperties::Mass(1.0),
             PbrBundle {
                 mesh: meshes.add(Mesh::from(shape::Cube { size: CUBE_SIZE })),
-                material: materials.add(Color::GRAY.into()),
+                material: materials.add(Color::GRAY),
                 transform: Transform::from_xyz(0.0, CUBE_SIZE, 0.0),
                 ..Default::default()
             },
@@ -91,7 +91,7 @@ fn add_rotary_interved_pendulum(
                     height: CYLINDER_HEIGHT,
                     ..Default::default()
                 })),
-                material: materials.add(Color::GRAY.into()),
+                material: materials.add(Color::GRAY),
                 transform: Transform::from_xyz(0.0, CUBE_SIZE + CYLINDER_HEIGHT / 2.0, 0.0),
                 ..Default::default()
             },
@@ -116,7 +116,7 @@ fn add_rotary_interved_pendulum(
             ColliderMassProperties::Mass(1.0),
             PbrBundle {
                 mesh: meshes.add(Mesh::from(shape::Cube { size: CUBE_SIZE })),
-                material: materials.add(Color::GRAY.into()),
+                material: materials.add(Color::GRAY),
                 transform: Transform::from_xyz(
                     0.0,
                     CUBE_SIZE + CYLINDER_HEIGHT + CUBE_SIZE / 2.0,
@@ -149,7 +149,7 @@ fn add_rotary_interved_pendulum(
                     height: CYLINDER_HEIGHT,
                     ..Default::default()
                 })),
-                material: materials.add(Color::GRAY.into()),
+                material: materials.add(Color::GRAY),
                 transform: Transform::from_xyz(
                     0.0,
                     CUBE_SIZE + CYLINDER_HEIGHT + CUBE_SIZE / 2.0,
@@ -176,7 +176,7 @@ fn add_rotary_interved_pendulum(
             ColliderMassProperties::Mass(1.0),
             PbrBundle {
                 mesh: meshes.add(Mesh::from(shape::Cube { size: CUBE_SIZE })),
-                material: materials.add(Color::GRAY.into()),
+                material: materials.add(Color::GRAY),
                 transform: Transform::from_xyz(
                     0.0,
                     CUBE_SIZE + CYLINDER_HEIGHT + CUBE_SIZE / 2.0,
@@ -208,7 +208,7 @@ fn add_rotary_interved_pendulum(
                     height: CYLINDER_HEIGHT,
                     ..Default::default()
                 })),
-                material: materials.add(Color::GRAY.into()),
+                material: materials.add(Color::GRAY),
                 transform: Transform::from_xyz(
                     0.0,
                     CUBE_SIZE + CYLINDER_HEIGHT / 2.0,
@@ -234,7 +234,7 @@ fn add_rotary_interved_pendulum(
 
 /// This system is used to control the motor.
 fn control_motor(
-    key: Res<Input<KeyCode>>,
+    key: Res<ButtonInput<KeyCode>>,
     motor: ResMut<Motor>,
     mut query: Query<&mut ImpulseJoint>,
     key_bindings: Res<Persistent<KeyBindings>>,
@@ -256,7 +256,7 @@ fn control_motor(
                     .as_revolute_mut()
                     .unwrap()
                     .set_motor_velocity(-velocity, factor);
-            } else if key.just_pressed(KeyCode::Down) {
+            } else if key.just_pressed(KeyCode::ArrowDown) {
                 debug!("Stop");
                 joint
                     .data
