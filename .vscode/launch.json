@@ -4,15 +4,15 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'motion-control-playground'",
+            "name": "Debug executable 'digital-twin-playground'",
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=motion-control-playground",
-                    "--package=motion-control-playground"
+                    "--bin=digital-twin-playground",
+                    "--package=digital-twin-playground"
                 ],
                 "filter": {
-                    "name": "motion-control-playground",
+                    "name": "digital-twin-playground",
                     "kind": "bin"
                 }
             },
@@ -22,16 +22,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'motion-control-playground'",
+            "name": "Debug unit tests in executable 'digital-twin-playground'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=motion-control-playground",
-                    "--package=motion-control-playground"
+                    "--bin=digital-twin-playground",
+                    "--package=digital-twin-playground"
                 ],
                 "filter": {
-                    "name": "motion-control-playground",
+                    "name": "digital-twin-playground",
                     "kind": "bin"
                 }
             },

@@ -1,10 +1,10 @@
-# Motion control playground
+# Digital twin playground
 
 This project is a virtual environment for testing different motion control algorithms. It uses the Bevy game engine and is written in Rust.
 
 > :warning: This project is in alpha stage and there is still work in progress.
 
-[pendulum.webm](https://github.com/Open-Source-Digital-Twin/motion-control-playground/assets/54245866/4d3ade7f-2c11-4636-b72e-9c02252f964d)
+[pendulum.webm](assets/pendulum.webm)
 
 ## Features
 * Import 3D models from Blender
