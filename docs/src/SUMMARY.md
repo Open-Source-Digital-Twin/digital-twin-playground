@@ -8,3 +8,4 @@
     - [Controls](./user-interface/controls.md)
 - [Architecture](./architecture/introduction.md)
 - [Contributing](./contributing/introduction.md)
+- [Roadmap](./roadmap/introduction.md)
