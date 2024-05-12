@@ -6,11 +6,6 @@ This project is a virtual environment for testing different motion control algor
 
 [assets_pendulum.webm](https://github.com/Open-Source-Digital-Twin/digital-twin-playground/assets/34453935/b18dc889-42f7-41d6-bf9b-83371812bd2e)
 
-## Features
-* Import 3D models from Blender
-* Control the motion of the models using different controllers, such as PID, fuzzy, and adaptive control (or any other creative strategies)
-* Visualize the results of the control algorithms
-
 ## Documentation
 The documentation for the project can be found in the docs directory. The documentation is written in Markdown and can be viewed in the browser using the [mdBook](https://github.com/rust-lang/mdBook) tool.
 

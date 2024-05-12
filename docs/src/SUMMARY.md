@@ -1,5 +1,6 @@
 # Summary
 
+- [Digital Twin Playground](./project-introduction.md)
 - [Getting Started](./getting-started/introduction.md)
     - [Linux](./getting-started/linux.md)
     - [Windows](./getting-started/windows.md)
