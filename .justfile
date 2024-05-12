@@ -41,6 +41,14 @@ setup-wasm:
         echo 'runner = "wasm-server-runner"' >> ~/.cargo/config.toml; \
     fi
 
+# Recipe for building the documentation
+build-docs:
+    mdbook build docs/
+
+# Recipe for serving the documentation
+serve-docs:
+    mdbook serve docs/
+
 # Recipe for displaying help information
 help:
     @echo "Available recipes:"

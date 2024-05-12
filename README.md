@@ -11,27 +11,11 @@ This project is a virtual environment for testing different motion control algor
 * Control the motion of the models using different controllers, such as PID, fuzzy, and adaptive control (or any other creative strategies)
 * Visualize the results of the control algorithms
 
-## Getting Started
-1. Install Rust.
-2. Clone this repository.
-3. Run `git submodule update --init`
-4. Install [just](https://github.com/casey/just) to facilitate command handling (e.g., `cargo install just`).
-5. (Optional) Run `just setup-wasm` to setup your environment for building the WebAssembly version of the project.
-6. Run `just run-linux` or `just run-wasm` to start the project.
-
-## Controls
-* Left mouse button - rotate camera
-* Right mouse button - pan camera
-* Mouse wheel - zoom camera
-* B - enable/disable frames for elements
-* L - start/stop animation
-* U - enable/disable shadows
-
 ## Documentation
-The documentation for the project can be found in the docs directory.
+The documentation for the project can be found in the docs directory. The documentation is written in Markdown and can be viewed in the browser using the [mdBook](https://github.com/rust-lang/mdBook) tool.
 
 ## Contributing
-Contributions to this project are welcome! Please open an issue or a pull request if you have any ideas or improvements.
+Contributions to this project are welcome! Please open an issue or a pull request if you have any ideas or improvements. The full instructions for contributing can be found in the [Contributing](./docs/src/contributing/introduction.md) section.
 
 ## License
 This project is licensed under the MIT License.
