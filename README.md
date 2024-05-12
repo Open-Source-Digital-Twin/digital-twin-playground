@@ -4,7 +4,7 @@ This project is a virtual environment for testing different motion control algor
 
 > :warning: This project is in alpha stage and there is still work in progress.
 
-[pendulum.webm](assets/pendulum.webm)
+[assets_pendulum.webm](https://github.com/Open-Source-Digital-Twin/digital-twin-playground/assets/34453935/b18dc889-42f7-41d6-bf9b-83371812bd2e)
 
 ## Features
 * Import 3D models from Blender
