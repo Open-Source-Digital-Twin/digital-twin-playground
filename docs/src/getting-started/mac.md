@@ -1,0 +1,3 @@
+# Mac
+
+> 🚧 Not supported yet.
