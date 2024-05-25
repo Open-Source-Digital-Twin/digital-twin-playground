@@ -1,0 +1,15 @@
+body {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+  }
+
+@viewport {
+    width: device-width;
+    height: device-height;
+    scale: 1.0;
+    /* Additional CSS properties for the viewport */
+}
