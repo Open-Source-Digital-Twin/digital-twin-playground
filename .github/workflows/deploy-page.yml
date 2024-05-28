@@ -40,7 +40,7 @@ jobs:
         run: cargo install trunk || true
 
       - name: Build the Rust WASM app and all of its assets
-        run: trunk build --public-url ${{ github.event.repository.name }}
+        run: trunk build --release --public-url ${{ github.event.repository.name }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
