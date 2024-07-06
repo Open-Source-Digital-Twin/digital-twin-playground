@@ -7,7 +7,7 @@ authors = ["Caio Piccirillo <caiopiccirillo@gmail.com>"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bevy = { version = "0.13.1", features = ["serialize"] }
+bevy = { version = "0.14.0", features = ["serialize"] }
 bevy_panorbit_camera = { version = "0.18.2" }
 bevy_rapier3d = { version = "0.26.0", features = [
     "simd-stable",
