@@ -14,7 +14,7 @@ bevy_rapier3d = { version = "0.26.0", features = [
     "wasm-bindgen",
 ] } # "debug-render-3d
 bevy-inspector-egui = "0.23.4"
-bevy-persistent = { version = "0.5.0", features = ["all"] }
+bevy-persistent = { version = "0.6.0", features = ["all"] }
 serde = { version = "1.0", features = ["derive"] }
 dirs = "5.0"
 bevy_infinite_grid = { git = "https://github.com/ForesightMiningSoftwareCorporation/bevy_infinite_grid", rev = "b96e4d7c6c4e0825f77a12cf38a525a3d6a1962c" }
