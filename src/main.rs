@@ -13,7 +13,6 @@ use bevy::{
     render::primitives::{Aabb, Sphere},
 };
 
-use bevy_infinite_grid::{InfiniteGrid, InfiniteGridBundle, InfiniteGridPlugin};
 // use bevy_infinite_grid::{InfiniteGrid, InfiniteGridBundle, InfiniteGridPlugin};
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_rapier3d::prelude::*;
@@ -59,8 +58,7 @@ fn main() {
         WorldInspectorPlugin::new(),
         RapierPhysicsPlugin::<NoUserData>::default(),
         RapierDebugRenderPlugin::default(),
-        ConfigPlugin,
-        InfiniteGridPlugin,
+        ConfigPlugin, // InfiniteGridPlugin,
     ))
     .add_systems(Startup, setup);
 
@@ -109,13 +107,13 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             intensity: 1.0,
         },
     ));
-    commands.spawn(InfiniteGridBundle {
-        grid: InfiniteGrid {
-            // shadow_color: None,
-            // ..default()
-        },
-        ..default()
-    });
+    // commands.spawn(InfiniteGridBundle {
+    //     grid: InfiniteGrid {
+    //         // shadow_color: None,
+    //         // ..default()
+    //     },
+    //     ..default()
+    // });
 }
 
 #[cfg(feature = "blender")]
@@ -180,12 +178,12 @@ fn setup_scene_after_load(
             scene_handle.has_light = true;
         }
 
-        commands.spawn(InfiniteGridBundle {
-            grid: InfiniteGrid {
-                // shadow_color: None,
-                ..default()
-            },
-            ..default()
-        });
+        // commands.spawn(InfiniteGridBundle {
+        //     grid: InfiniteGrid {
+        //         // shadow_color: None,
+        //         ..default()
+        //     },
+        //     ..default()
+        // });
     }
 }

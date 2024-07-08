@@ -36,7 +36,6 @@ struct Motor {
 fn add_rotary_interved_pendulum(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
     mut motor: ResMut<Motor>,
 ) {
     const GROUND_THICKNESS: f32 = 0.01;
@@ -69,7 +68,6 @@ fn add_rotary_interved_pendulum(
                         z: 0.0,
                     },
                 })),
-                material: materials.add(Color::GRAY),
                 transform: Transform::from_xyz(0.0, CUBE_SIZE, 0.0),
                 ..Default::default()
             },
@@ -96,7 +94,6 @@ fn add_rotary_interved_pendulum(
                     radius: CYLINDER_RADIUS,
                     half_height: CYLINDER_HEIGHT / 2.0,
                 })),
-                material: materials.add(Color::GRAY),
                 transform: Transform::from_xyz(0.0, CUBE_SIZE + CYLINDER_HEIGHT / 2.0, 0.0),
                 ..Default::default()
             },
@@ -127,7 +124,6 @@ fn add_rotary_interved_pendulum(
                         z: 0.0,
                     },
                 })),
-                material: materials.add(Color::GRAY),
                 transform: Transform::from_xyz(
                     0.0,
                     CUBE_SIZE + CYLINDER_HEIGHT + CUBE_SIZE / 2.0,
@@ -159,7 +155,6 @@ fn add_rotary_interved_pendulum(
                     radius: CYLINDER_RADIUS,
                     half_height: CYLINDER_HEIGHT / 2.0,
                 })),
-                material: materials.add(Color::GRAY),
                 transform: Transform::from_xyz(
                     0.0,
                     CUBE_SIZE + CYLINDER_HEIGHT + CUBE_SIZE / 2.0,
@@ -192,7 +187,6 @@ fn add_rotary_interved_pendulum(
                         z: 0.0,
                     },
                 })),
-                material: materials.add(Color::GRAY),
                 transform: Transform::from_xyz(
                     0.0,
                     CUBE_SIZE + CYLINDER_HEIGHT + CUBE_SIZE / 2.0,
@@ -223,7 +217,6 @@ fn add_rotary_interved_pendulum(
                     radius: CYLINDER_RADIUS,
                     half_height: CYLINDER_HEIGHT / 2.0,
                 })),
-                material: materials.add(Color::GRAY),
                 transform: Transform::from_xyz(
                     0.0,
                     CUBE_SIZE + CYLINDER_HEIGHT / 2.0,
@@ -262,12 +255,14 @@ fn control_motor(
             if key.just_pressed(key_bindings.rotate_clockwise) {
                 joint
                     .data
+                    .as_mut()
                     .as_revolute_mut()
                     .unwrap()
                     .set_motor_velocity(velocity, factor);
             } else if key.just_pressed(key_bindings.rotate_counter_clockwise) {
                 joint
                     .data
+                    .as_mut()
                     .as_revolute_mut()
                     .unwrap()
                     .set_motor_velocity(-velocity, factor);
@@ -275,6 +270,7 @@ fn control_motor(
                 debug!("Stop");
                 joint
                     .data
+                    .as_mut()
                     .as_revolute_mut()
                     .unwrap()
                     .set_motor_velocity(0.0, factor);

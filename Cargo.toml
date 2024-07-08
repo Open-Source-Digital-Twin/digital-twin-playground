@@ -7,17 +7,17 @@ authors = ["Caio Piccirillo <caiopiccirillo@gmail.com>"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bevy = { version = "0.13.1", features = ["serialize"] }
-bevy_panorbit_camera = { version = "0.18.2" }
-bevy_rapier3d = { version = "0.26.0", features = [
+bevy = { version = "0.14.0", features = ["serialize"] }
+bevy_panorbit_camera = { version = "0.19.0" }
+bevy_rapier3d = { version = "0.27.0", features = [
     "simd-stable",
     "wasm-bindgen",
 ] } # "debug-render-3d
-bevy-inspector-egui = "0.23.4"
-bevy-persistent = { version = "0.5.0", features = ["all"] }
+bevy-inspector-egui = "0.25.0"
+bevy-persistent = { version = "0.6.0", features = ["all"] }
 serde = { version = "1.0", features = ["derive"] }
 dirs = "5.0"
-bevy_infinite_grid = { git = "https://github.com/ForesightMiningSoftwareCorporation/bevy_infinite_grid", rev = "b96e4d7c6c4e0825f77a12cf38a525a3d6a1962c" }
+# bevy_infinite_grid = { git = "https://github.com/ForesightMiningSoftwareCorporation/bevy_infinite_grid", rev = "b96e4d7c6c4e0825f77a12cf38a525a3d6a1962c" }
 
 # Enable a small amount of optimization in debug mode
 [profile.dev]
