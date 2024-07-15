@@ -8,12 +8,12 @@ authors = ["Caio Piccirillo <caiopiccirillo@gmail.com>"]
 
 [dependencies]
 bevy = { version = "0.14.0", features = ["serialize"] }
-bevy_panorbit_camera = { version = "0.19.0" }
+bevy_panorbit_camera = { version = "0.19.1" }
 bevy_rapier3d = { version = "0.27.0", features = [
     "simd-stable",
     "wasm-bindgen",
 ] } # "debug-render-3d
-bevy-inspector-egui = "0.25.0"
+bevy-inspector-egui = "0.25.1"
 bevy-persistent = { version = "0.6.0", features = ["all"] }
 serde = { version = "1.0", features = ["derive"] }
 dirs = "5.0"
