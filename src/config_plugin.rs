@@ -1,7 +1,7 @@
-/// This file contains the implementation of a Bevy plugin for managing configuration settings.
-/// It defines the `ConfigPlugin` struct and implements the `Plugin` trait for it.
-/// The plugin adds systems for startup and setup to the Bevy application.
-/// The `setup` function initializes the key bindings resource using the `Persistent` builder.
+//! This file contains the implementation of a Bevy plugin for managing configuration settings.
+//! It defines the `ConfigPlugin` struct and implements the `Plugin` trait for it.
+//! The plugin adds systems for startup and setup to the Bevy application.
+//! The `setup` function initializes the key bindings resource using the `Persistent` builder.
 use bevy::prelude::*;
 use bevy_persistent::prelude::*;
 use serde::{Deserialize, Serialize};

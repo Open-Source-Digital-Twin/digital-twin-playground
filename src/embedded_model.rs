@@ -44,9 +44,6 @@ fn add_rotary_interved_pendulum(
     const CUBE_SIZE: f32 = 1.0;
     const CYLINDER_RADIUS: f32 = 0.25;
     const CYLINDER_HEIGHT: f32 = 3.0;
-    // const SPHERE_RADIUS: f32 = 1.0;
-
-    // let mut body_entities: Vec<_> = Vec::new();
 
     let ground = commands
         .spawn((

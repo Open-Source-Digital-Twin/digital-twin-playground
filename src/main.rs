@@ -1,9 +1,7 @@
-//! A simple glTF scene viewer made with Bevy.
+//! A application to control and emulate mechanical systems and play as a workbench for
+//! physics simulations.
 //!
-//! Just run `cargo run --release /path/to/model.gltf`,
-//! replacing the path as appropriate.
-//! In case of multiple scenes, you can select which to display by adapting the file path: `/path/to/model.gltf#Scene1`.
-//! With no arguments it will load the `rotary_pendulum` glTF model from the repository assets subdirectory.
+//! Just run `cargo run --release`, and you should see a window with a basic example.
 
 use bevy::{prelude::*, window::WindowPlugin};
 
