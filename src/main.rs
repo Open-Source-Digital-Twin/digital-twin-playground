@@ -5,7 +5,7 @@
 
 use bevy::{prelude::*, window::WindowPlugin};
 
-#[cfg(feature = "blender")]
+#[cfg(feature = "blender-model")]
 use bevy::{
     math::Vec3A,
     render::primitives::{Aabb, Sphere},
@@ -16,7 +16,7 @@ use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_rapier3d::prelude::*;
 #[cfg(feature = "embedded-model")]
 mod embedded_model;
-#[cfg(feature = "blender")]
+#[cfg(feature = "blender-model")]
 mod scene_viewer_plugin;
 
 mod config_plugin;
@@ -24,7 +24,7 @@ mod config_plugin;
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
 #[cfg(feature = "embedded-model")]
 use embedded_model::EmbeddedModelPlugin;
-#[cfg(feature = "blender")]
+#[cfg(feature = "blender-model")]
 use scene_viewer_plugin::{SceneHandle, SceneViewerPlugin};
 
 use config_plugin::ConfigPlugin;
@@ -49,7 +49,7 @@ fn main() {
                 ..default()
             }),
         PanOrbitCameraPlugin,
-        #[cfg(feature = "blender")]
+        #[cfg(feature = "blender-model")]
         SceneViewerPlugin,
         #[cfg(feature = "embedded-model")]
         EmbeddedModelPlugin,
@@ -60,7 +60,7 @@ fn main() {
     ))
     .add_systems(Startup, setup);
 
-    #[cfg(feature = "blender")]
+    #[cfg(feature = "blender-model")]
     app.add_systems(PreUpdate, setup_scene_after_load);
 
     app.run();
@@ -81,7 +81,7 @@ fn _parse_scene(scene_path: String) -> (String, usize) {
     (scene_path, 0)
 }
 
-#[cfg(feature = "blender")]
+#[cfg(feature = "blender-model")]
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     let scene_path = std::env::args()
         .nth(1)
@@ -114,7 +114,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     // });
 }
 
-#[cfg(feature = "blender")]
+#[cfg(feature = "blender-model")]
 fn setup_scene_after_load(
     mut commands: Commands,
     mut setup: Local<bool>,
