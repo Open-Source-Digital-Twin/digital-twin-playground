@@ -17,7 +17,6 @@ bevy-inspector-egui = "0.26.0"
 bevy-persistent = { version = "0.6.0", features = ["all"] }
 serde = { version = "1.0", features = ["derive"] }
 dirs = "5.0"
-# bevy_infinite_grid = { git = "https://github.com/ForesightMiningSoftwareCorporation/bevy_infinite_grid", rev = "b96e4d7c6c4e0825f77a12cf38a525a3d6a1962c" }
 
 # Enable a small amount of optimization in debug mode
 [profile.dev]
