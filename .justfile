@@ -7,14 +7,14 @@ build-wasm:
 # Recipe for running Cargo project on WebAssembly (wasm)
 run-wasm: fmt clippy
     @if ! rustup target list | grep wasm32-unknown-unknown >/dev/null; then \
-        echo "wasm32-unknown-unknown target not installed. Run 'just install-wasm' to install it."; \
+        echo "wasm32-unknown-unknown target not installed. Run 'just setup-wasm' to install it."; \
         exit 1; \
     fi
-    @if ! command -v wasm-server-runner >/dev/null; then \
-        echo "wasm-server-runner not installed. Please install it and make sure it's in your PATH."; \
+    @if ! command -v trunk >/dev/null; then \
+        echo "trunk not installed. Please install it and make sure it's in your PATH."; \
         exit 1; \
     fi
-    cargo run --target wasm32-unknown-unknown
+    trunk serve --open
 
 # Recipe for building Cargo project for Linux native
 build-linux:
@@ -40,6 +40,7 @@ setup-wasm:
         echo '[target.wasm32-unknown-unknown]' >> ~/.cargo/config.toml; \
         echo 'runner = "wasm-server-runner"' >> ~/.cargo/config.toml; \
     fi
+    cargo install trunk || true
 
 # Recipe for building the documentation
 build-docs:
