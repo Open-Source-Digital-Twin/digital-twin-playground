@@ -22,6 +22,10 @@ dirs = "5.0"
 [profile.dev]
 opt-level = 1
 
+# Enable high optimizations in release mode
+[profile.release]
+opt-level = 'z'
+
 # Enable high optimizations for dependencies (incl. Bevy), but not for our code:
 [profile.dev.package."*"]
 opt-level = 3
