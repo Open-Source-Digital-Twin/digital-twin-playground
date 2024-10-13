@@ -34,7 +34,7 @@ fn main() {
     let mut app = App::new();
     app.insert_resource(AmbientLight {
         color: Color::WHITE,
-        brightness: 1.0 / 5.0f32,
+        brightness: 2_000.0,
     })
     .add_plugins((
         DefaultPlugins
@@ -104,7 +104,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             diffuse_map: asset_server.load("assets/environment_maps/pisa_diffuse_rgb9e5_zstd.ktx2"),
             specular_map: asset_server
                 .load("assets/environment_maps/pisa_specular_rgb9e5_zstd.ktx2"),
-            intensity: 1.0,
+            intensity: 2_000.0,
         },
     ));
 }
