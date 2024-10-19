@@ -36,6 +36,7 @@ struct Motor {
 fn add_rotary_interved_pendulum(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
     mut motor: ResMut<Motor>,
 ) {
     const GROUND_THICKNESS: f32 = 0.01;
@@ -58,15 +59,10 @@ fn add_rotary_interved_pendulum(
             Collider::cuboid(CUBE_SIZE / 2.0, CUBE_SIZE / 2.0, CUBE_SIZE / 2.0),
             ColliderMassProperties::Mass(1.0),
             PbrBundle {
-                mesh: meshes.add(Mesh::from(Cuboid {
-                    half_size: Vec3 {
-                        x: 0.0,
-                        y: CUBE_SIZE / 2.0,
-                        z: 0.0,
-                    },
-                })),
+                mesh: meshes.add(Cuboid::new(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE)),
+                material: materials.add(Color::srgb_u8(124, 124, 124)),
                 transform: Transform::from_xyz(0.0, CUBE_SIZE, 0.0),
-                ..Default::default()
+                ..default()
             },
         ))
         .id();
@@ -91,6 +87,7 @@ fn add_rotary_interved_pendulum(
                     radius: CYLINDER_RADIUS,
                     half_height: CYLINDER_HEIGHT / 2.0,
                 })),
+                material: materials.add(Color::srgb_u8(124, 124, 124)),
                 transform: Transform::from_xyz(0.0, CUBE_SIZE + CYLINDER_HEIGHT / 2.0, 0.0),
                 ..Default::default()
             },
@@ -114,13 +111,8 @@ fn add_rotary_interved_pendulum(
             Collider::cuboid(CUBE_SIZE / 2.0, CUBE_SIZE / 2.0, CUBE_SIZE / 2.0),
             ColliderMassProperties::Mass(1.0),
             PbrBundle {
-                mesh: meshes.add(Mesh::from(Cuboid {
-                    half_size: Vec3 {
-                        x: 0.0,
-                        y: CUBE_SIZE / 2.0,
-                        z: 0.0,
-                    },
-                })),
+                mesh: meshes.add(Cuboid::new(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE)),
+                material: materials.add(Color::srgb_u8(124, 124, 124)),
                 transform: Transform::from_xyz(
                     0.0,
                     CUBE_SIZE + CYLINDER_HEIGHT + CUBE_SIZE / 2.0,
@@ -152,6 +144,7 @@ fn add_rotary_interved_pendulum(
                     radius: CYLINDER_RADIUS,
                     half_height: CYLINDER_HEIGHT / 2.0,
                 })),
+                material: materials.add(Color::srgb_u8(124, 124, 124)),
                 transform: Transform::from_xyz(
                     0.0,
                     CUBE_SIZE + CYLINDER_HEIGHT + CUBE_SIZE / 2.0,
@@ -177,13 +170,8 @@ fn add_rotary_interved_pendulum(
             Collider::cuboid(CUBE_SIZE / 2.0, CUBE_SIZE / 2.0, CUBE_SIZE / 2.0),
             ColliderMassProperties::Mass(1.0),
             PbrBundle {
-                mesh: meshes.add(Mesh::from(Cuboid {
-                    half_size: Vec3 {
-                        x: 0.0,
-                        y: CUBE_SIZE / 2.0,
-                        z: 0.0,
-                    },
-                })),
+                mesh: meshes.add(Cuboid::new(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE)),
+                material: materials.add(Color::srgb_u8(124, 124, 124)),
                 transform: Transform::from_xyz(
                     0.0,
                     CUBE_SIZE + CYLINDER_HEIGHT + CUBE_SIZE / 2.0,
@@ -214,6 +202,7 @@ fn add_rotary_interved_pendulum(
                     radius: CYLINDER_RADIUS,
                     half_height: CYLINDER_HEIGHT / 2.0,
                 })),
+                material: materials.add(Color::srgb_u8(124, 124, 124)),
                 transform: Transform::from_xyz(
                     0.0,
                     CUBE_SIZE + CYLINDER_HEIGHT / 2.0,
