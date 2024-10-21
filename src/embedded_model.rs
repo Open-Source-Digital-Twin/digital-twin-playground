@@ -22,7 +22,8 @@ impl Plugin for EmbeddedModelPlugin {
             .add_systems(
                 Update,
                 control_motor.run_if(resource_changed::<ButtonInput<KeyCode>>),
-            );
+            )
+            .add_systems(Update, get_pendulum_state);
     }
 }
 
@@ -32,6 +33,18 @@ struct Motor {
     joint_entity: Option<Entity>,
 }
 
+#[derive(Component)]
+struct Name(String);
+
+impl Name {
+    fn new(name: &str) -> Self {
+        Name(name.to_string())
+    }
+
+    fn as_str(&self) -> &str {
+        &self.0
+    }
+}
 /// This system is used to create the scene with embedded model.
 fn add_rotary_interved_pendulum(
     mut commands: Commands,
@@ -153,6 +166,7 @@ fn add_rotary_interved_pendulum(
                 .with_rotation(Quat::from_rotation_x(std::f32::consts::PI / 2.0)),
                 ..Default::default()
             },
+            Name::new("cylinder_2"),
         ))
         .id();
 
@@ -179,6 +193,7 @@ fn add_rotary_interved_pendulum(
                 ),
                 ..Default::default()
             },
+            Name::new("cube_3"),
         ))
         .id();
 
@@ -210,6 +225,7 @@ fn add_rotary_interved_pendulum(
                 ),
                 ..Default::default()
             },
+            Name::new("cylinder_3"),
         ))
         .id();
 
@@ -265,5 +281,32 @@ fn control_motor(
         _ => {
             warn!("No joint entity");
         }
+    }
+}
+
+fn get_pendulum_state(query: Query<(&Transform, &Name)>) {
+    let mut cube_3_transform = None;
+    let mut cylinder_2_transform = None;
+
+    for (transform, name) in query.iter() {
+        match name.as_str() {
+            "cube_3" => cube_3_transform = Some(*transform),
+            "cylinder_2" => cylinder_2_transform = Some(*transform),
+            _ => {}
+        }
+    }
+
+    if let (Some(cube_3_transform), Some(cylinder_2_transform)) =
+        (cube_3_transform, cylinder_2_transform)
+    {
+        // Calculate the relative rotation
+        let relative_rotation = cube_3_transform.rotation * cylinder_2_transform.rotation.inverse();
+
+        // The angle of the relative rotation is between 0 and 2*PI.
+        let (_axis, angle) = relative_rotation.to_axis_angle();
+
+        println!("Relative angle: {:?}", angle);
+    } else {
+        println!("cube_3 or cylinder_2 not found");
     }
 }
