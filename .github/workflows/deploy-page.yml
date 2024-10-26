@@ -21,6 +21,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Restore cache
         uses: actions/cache@v4
         with:
@@ -42,10 +43,18 @@ jobs:
       - name: Build the Rust WASM app and all of its assets
         run: trunk build --release --public-url ${{ github.event.repository.name }}
 
+      - name: Install mdbook
+        run: cargo install mdbook
+
+      - name: Build the documentation
+        run: mdbook build docs/
+
+      - name: Copy documentation to dist
+        run: cp -r docs/book/* dist/
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
-      - name: Add assets to dist
-        run: cp -r ./assets ./dist
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
