@@ -61,7 +61,7 @@ fn add_rotary_interved_pendulum(
     let ground = commands
         .spawn((
             RigidBody::Fixed,
-            TransformBundle::from(Transform::from_xyz(0.0, -GROUND_THICKNESS, 0.0)),
+            Transform::from_xyz(0.0, -GROUND_THICKNESS, 0.0),
             Collider::cuboid(GROUND_SIDE_SIZE, GROUND_THICKNESS, GROUND_SIDE_SIZE),
         ))
         .id();
@@ -71,12 +71,9 @@ fn add_rotary_interved_pendulum(
             RigidBody::Dynamic,
             Collider::cuboid(CUBE_SIZE / 2.0, CUBE_SIZE / 2.0, CUBE_SIZE / 2.0),
             ColliderMassProperties::Mass(1.0),
-            PbrBundle {
-                mesh: meshes.add(Cuboid::new(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE)),
-                material: materials.add(Color::srgb_u8(124, 124, 124)),
-                transform: Transform::from_xyz(0.0, CUBE_SIZE, 0.0),
-                ..default()
-            },
+            Mesh3d(meshes.add(Cuboid::new(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE))),
+            MeshMaterial3d(materials.add(Color::srgb_u8(124, 124, 124))),
+            Transform::from_xyz(0.0, CUBE_SIZE, 0.0),
         ))
         .id();
 
@@ -95,15 +92,12 @@ fn add_rotary_interved_pendulum(
             LockedAxes::TRANSLATION_LOCKED
                 | LockedAxes::ROTATION_LOCKED_X
                 | LockedAxes::ROTATION_LOCKED_Z,
-            PbrBundle {
-                mesh: meshes.add(Mesh::from(Cylinder {
-                    radius: CYLINDER_RADIUS,
-                    half_height: CYLINDER_HEIGHT / 2.0,
-                })),
-                material: materials.add(Color::srgb_u8(124, 124, 124)),
-                transform: Transform::from_xyz(0.0, CUBE_SIZE + CYLINDER_HEIGHT / 2.0, 0.0),
-                ..Default::default()
-            },
+            Mesh3d(meshes.add(Mesh::from(Cylinder {
+                radius: CYLINDER_RADIUS,
+                half_height: CYLINDER_HEIGHT / 2.0,
+            }))),
+            MeshMaterial3d(materials.add(Color::srgb_u8(124, 124, 124))),
+            Transform::from_xyz(0.0, CUBE_SIZE + CYLINDER_HEIGHT / 2.0, 0.0),
         ))
         .id();
 
@@ -123,16 +117,9 @@ fn add_rotary_interved_pendulum(
             RigidBody::Dynamic,
             Collider::cuboid(CUBE_SIZE / 2.0, CUBE_SIZE / 2.0, CUBE_SIZE / 2.0),
             ColliderMassProperties::Mass(1.0),
-            PbrBundle {
-                mesh: meshes.add(Cuboid::new(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE)),
-                material: materials.add(Color::srgb_u8(124, 124, 124)),
-                transform: Transform::from_xyz(
-                    0.0,
-                    CUBE_SIZE + CYLINDER_HEIGHT + CUBE_SIZE / 2.0,
-                    0.0,
-                ),
-                ..Default::default()
-            },
+            Mesh3d(meshes.add(Cuboid::new(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE))),
+            MeshMaterial3d(materials.add(Color::srgb_u8(124, 124, 124))),
+            Transform::from_xyz(0.0, CUBE_SIZE + CYLINDER_HEIGHT + CUBE_SIZE / 2.0, 0.0),
         ))
         .id();
 
@@ -152,20 +139,17 @@ fn add_rotary_interved_pendulum(
             Collider::cylinder(CYLINDER_HEIGHT / 2.0, CYLINDER_RADIUS),
             LockedAxes::TRANSLATION_LOCKED_Y,
             ColliderMassProperties::Mass(1.0),
-            PbrBundle {
-                mesh: meshes.add(Mesh::from(Cylinder {
-                    radius: CYLINDER_RADIUS,
-                    half_height: CYLINDER_HEIGHT / 2.0,
-                })),
-                material: materials.add(Color::srgb_u8(124, 124, 124)),
-                transform: Transform::from_xyz(
-                    0.0,
-                    CUBE_SIZE + CYLINDER_HEIGHT + CUBE_SIZE / 2.0,
-                    CUBE_SIZE / 2.0 + CYLINDER_HEIGHT / 2.0,
-                )
-                .with_rotation(Quat::from_rotation_x(std::f32::consts::PI / 2.0)),
-                ..Default::default()
-            },
+            Mesh3d(meshes.add(Mesh::from(Cylinder {
+                radius: CYLINDER_RADIUS,
+                half_height: CYLINDER_HEIGHT / 2.0,
+            }))),
+            MeshMaterial3d(materials.add(Color::srgb_u8(124, 124, 124))),
+            Transform::from_xyz(
+                0.0,
+                CUBE_SIZE + CYLINDER_HEIGHT + CUBE_SIZE / 2.0,
+                CUBE_SIZE / 2.0 + CYLINDER_HEIGHT / 2.0,
+            )
+            .with_rotation(Quat::from_rotation_x(std::f32::consts::PI / 2.0)),
             Name::new("cylinder_2"),
         ))
         .id();
@@ -183,16 +167,13 @@ fn add_rotary_interved_pendulum(
             RigidBody::Dynamic,
             Collider::cuboid(CUBE_SIZE / 2.0, CUBE_SIZE / 2.0, CUBE_SIZE / 2.0),
             ColliderMassProperties::Mass(1.0),
-            PbrBundle {
-                mesh: meshes.add(Cuboid::new(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE)),
-                material: materials.add(Color::srgb_u8(124, 124, 124)),
-                transform: Transform::from_xyz(
-                    0.0,
-                    CUBE_SIZE + CYLINDER_HEIGHT + CUBE_SIZE / 2.0,
-                    CUBE_SIZE + CYLINDER_HEIGHT,
-                ),
-                ..Default::default()
-            },
+            Mesh3d(meshes.add(Cuboid::new(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE))),
+            MeshMaterial3d(materials.add(Color::srgb_u8(124, 124, 124))),
+            Transform::from_xyz(
+                0.0,
+                CUBE_SIZE + CYLINDER_HEIGHT + CUBE_SIZE / 2.0,
+                CUBE_SIZE + CYLINDER_HEIGHT,
+            ),
             Name::new("cube_3"),
         ))
         .id();
@@ -212,19 +193,16 @@ fn add_rotary_interved_pendulum(
             RigidBody::Dynamic,
             Collider::cylinder(CYLINDER_HEIGHT / 2.0, CYLINDER_RADIUS),
             ColliderMassProperties::Mass(1.0),
-            PbrBundle {
-                mesh: meshes.add(Mesh::from(Cylinder {
-                    radius: CYLINDER_RADIUS,
-                    half_height: CYLINDER_HEIGHT / 2.0,
-                })),
-                material: materials.add(Color::srgb_u8(124, 124, 124)),
-                transform: Transform::from_xyz(
-                    0.0,
-                    CUBE_SIZE + CYLINDER_HEIGHT / 2.0,
-                    CUBE_SIZE / 2.0 + CYLINDER_HEIGHT + CUBE_SIZE / 2.0,
-                ),
-                ..Default::default()
-            },
+            Mesh3d(meshes.add(Mesh::from(Cylinder {
+                radius: CYLINDER_RADIUS,
+                half_height: CYLINDER_HEIGHT / 2.0,
+            }))),
+            MeshMaterial3d(materials.add(Color::srgb_u8(124, 124, 124))),
+            Transform::from_xyz(
+                0.0,
+                CUBE_SIZE + CYLINDER_HEIGHT / 2.0,
+                CUBE_SIZE / 2.0 + CYLINDER_HEIGHT + CUBE_SIZE / 2.0,
+            ),
             Name::new("cylinder_3"),
         ))
         .id();
