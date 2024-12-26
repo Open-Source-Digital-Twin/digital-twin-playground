@@ -3,7 +3,7 @@
 //!
 //! Just run `cargo run --release`, and you should see a window with a basic example.
 
-use bevy::{color::palettes::css::RED, pbr::VolumetricLight, prelude::*, window::WindowPlugin};
+use bevy::{prelude::*, window::WindowPlugin};
 
 #[cfg(feature = "blender-model")]
 use bevy::{
@@ -93,7 +93,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.insert_resource(SceneHandle::new(asset_server.load(file_path), scene_index));
 }
 
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+fn setup(mut commands: Commands) {
     commands.spawn((
         Camera3d::default(),
         PanOrbitCamera::default(),
