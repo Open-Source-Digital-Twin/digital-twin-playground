@@ -3,7 +3,7 @@
 //!
 //! Just run `cargo run --release`, and you should see a window with a basic example.
 
-use bevy::{prelude::*, window::WindowPlugin};
+use bevy::{color::palettes::css::RED, pbr::VolumetricLight, prelude::*, window::WindowPlugin};
 
 #[cfg(feature = "blender-model")]
 use bevy::{
@@ -95,17 +95,9 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn((
-        Camera3dBundle {
-            transform: Transform::from_translation(Vec3::new(10.0, 10.0, 10.0)),
-            ..default()
-        },
+        Camera3d::default(),
         PanOrbitCamera::default(),
-        EnvironmentMapLight {
-            diffuse_map: asset_server.load("assets/environment_maps/pisa_diffuse_rgb9e5_zstd.ktx2"),
-            specular_map: asset_server
-                .load("assets/environment_maps/pisa_specular_rgb9e5_zstd.ktx2"),
-            intensity: 2_000.0,
-        },
+        Transform::from_translation(Vec3::new(10.0, 10.0, 10.0)),
     ));
 }
 

@@ -11,12 +11,6 @@ impl Plugin for GridPlugin {
 
 fn update(mut gizmos: Gizmos) {
     gizmos
-        .grid_3d(
-            Vec3::ZERO,
-            Quat::IDENTITY,
-            UVec3::new(10, 0, 10),
-            Vec3::splat(1.),
-            GRAY,
-        )
+        .grid_3d(Quat::IDENTITY, UVec3::new(10, 0, 10), Vec3::splat(1.), GRAY)
         .outer_edges();
 }
