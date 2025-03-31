@@ -8,7 +8,7 @@ authors = ["Caio Piccirillo <caiopiccirillo@gmail.com>"]
 
 [dependencies]
 bevy = { version = "0.15.0", features = ["serialize"] }
-bevy_panorbit_camera = { version = "0.23.0" }
+bevy_panorbit_camera = { version = "0.25.0" }
 bevy_rapier3d = { version = "0.28.0", features = [
     "simd-stable",
     "wasm-bindgen",
