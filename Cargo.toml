@@ -14,7 +14,7 @@ bevy_rapier3d = { version = "0.28.0", features = [
     "wasm-bindgen",
 ] } # "debug-render-3d
 bevy-inspector-egui = "0.30.0"
-bevy-persistent = { version = "0.7.0", features = ["all"] }
+bevy-persistent = { version = "0.8.0", features = ["all"] }
 serde = { version = "1.0", features = ["derive"] }
 dirs = "6.0"
 
