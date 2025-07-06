@@ -283,7 +283,7 @@ fn get_pendulum_state(query: Query<(&Transform, &Name)>) {
         // The angle of the relative rotation is between 0 and 2*PI.
         let (_axis, angle) = relative_rotation.to_axis_angle();
 
-        println!("Relative angle: {:?}", angle);
+        println!("Relative angle: {angle:?}");
     } else {
         println!("cube_3 or cylinder_2 not found");
     }
