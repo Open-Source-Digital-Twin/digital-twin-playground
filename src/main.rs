@@ -2,7 +2,6 @@
 //! physics simulations.
 //!
 //! Just run `cargo run --release`, and you should see a window with a basic example.
-
 use bevy::{prelude::*, window::WindowPlugin};
 
 #[cfg(feature = "blender-model")]
@@ -11,6 +10,7 @@ use bevy::{
     render::primitives::{Aabb, Sphere},
 };
 
+use bevy_egui::EguiPlugin;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_rapier3d::prelude::*;
 #[cfg(feature = "embedded-model")]
@@ -35,6 +35,7 @@ fn main() {
     app.insert_resource(AmbientLight {
         color: Color::WHITE,
         brightness: 2_000.0,
+        affects_lightmapped_meshes: false,
     })
     .add_plugins((
         DefaultPlugins
@@ -54,6 +55,9 @@ fn main() {
         SceneViewerPlugin,
         #[cfg(feature = "embedded-model")]
         EmbeddedModelPlugin,
+        EguiPlugin {
+            enable_multipass_for_primary_context: true,
+        },
         WorldInspectorPlugin::new(),
         RapierPhysicsPlugin::<NoUserData>::default(),
         RapierDebugRenderPlugin::default(),
