@@ -12,7 +12,7 @@ bevy_panorbit_camera = { version = "0.27.0" }
 bevy_rapier3d = { version = "0.30.0", features = [
     "simd-stable",
 ] } # "debug-render-3d
-bevy-inspector-egui = "0.31.0"
+bevy-inspector-egui = "0.33.1"
 bevy_egui = { version = "0.34.0", default-features = false }
 bevy-persistent = { version = "0.8.0", features = ["all"] }
 serde = { version = "1.0", features = ["derive"] }
