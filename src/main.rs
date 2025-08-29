@@ -55,9 +55,7 @@ fn main() {
         SceneViewerPlugin,
         #[cfg(feature = "embedded-model")]
         EmbeddedModelPlugin,
-        EguiPlugin {
-            enable_multipass_for_primary_context: true,
-        },
+        EguiPlugin::default(),
         WorldInspectorPlugin::new(),
         RapierPhysicsPlugin::<NoUserData>::default(),
         RapierDebugRenderPlugin::default(),
