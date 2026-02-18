@@ -7,14 +7,12 @@ authors = ["Caio Piccirillo <caiopiccirillo@gmail.com>"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bevy = { version = "0.16.1", features = ["serialize"] }
-bevy_panorbit_camera = { version = "0.28.0" }
-bevy_rapier3d = { version = "0.31.0", features = [
-    "simd-stable",
-] } # "debug-render-3d
-bevy-inspector-egui = "0.33.1"
-bevy_egui = { version = "0.36.0", default-features = false }
-bevy-persistent = { version = "0.8.0", features = ["all"] }
+bevy = { version = "0.18", features = ["serialize"] }
+avian3d = { git = "https://github.com/avianphysics/avian", rev = "309be19" }
+bevy_panorbit_camera = "0.34"
+bevy-inspector-egui = "0.36"
+bevy_egui = { version = "0.39", default-features = false }
+bevy-persistent = { version = "0.10", features = ["all"] }
 serde = { version = "1.0", features = ["derive"] }
 dirs = "6.0"
 
