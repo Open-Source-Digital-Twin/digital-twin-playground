@@ -16,6 +16,7 @@ message JointInfo {
   string body1_name = 4;
   string body2_name = 5;
   Vec3 hinge_axis = 6;
+  bool motor_controllable = 7;
 }
 
 enum JointType {

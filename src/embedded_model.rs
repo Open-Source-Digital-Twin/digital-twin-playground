@@ -6,6 +6,8 @@ use bevy::prelude::*;
 use bevy_persistent::Persistent;
 
 use crate::config_plugin::KeyBindings;
+#[cfg(feature = "grpc")]
+use crate::grpc_plugin::GrpcControllableJoint;
 
 pub struct EmbeddedModelPlugin;
 
@@ -136,6 +138,8 @@ fn add_rotary_inverted_pendulum(
                 }),
             JointCollisionDisabled,
             Name::new("motor_joint"),
+            #[cfg(feature = "grpc")]
+            GrpcControllableJoint,
         ))
         .id();
     motor.joint_entity = Some(joint_entity);

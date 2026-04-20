@@ -2,11 +2,13 @@ mod bridge;
 mod service;
 mod systems;
 
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 use std::sync::{Arc, Mutex, RwLock};
 
 use bevy::prelude::*;
 use tokio::sync::mpsc;
+
+pub use bridge::GrpcControllableJoint;
 
 use bridge::{GrpcBridge, SharedBridgeState};
 use service::JointControlService;
@@ -35,7 +37,7 @@ impl Plugin for GrpcPlugin {
         let (cmd_tx, cmd_rx) = mpsc::channel(256);
 
         let shared_state = Arc::new(SharedBridgeState {
-            joint_states: RwLock::new(HashMap::new()),
+            joints: RwLock::new(BTreeMap::new()),
             command_tx: cmd_tx,
             command_rx: Mutex::new(cmd_rx),
         });
