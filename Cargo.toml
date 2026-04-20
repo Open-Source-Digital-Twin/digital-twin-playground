@@ -8,7 +8,7 @@ authors = ["Caio Piccirillo <caiopiccirillo@gmail.com>"]
 
 [dependencies]
 bevy = { version = "0.18", features = ["serialize"] }
-avian3d = { git = "https://github.com/avianphysics/avian", rev = "309be19" }
+avian3d = "0.6.1"
 bevy_panorbit_camera = "0.34"
 bevy-inspector-egui = "0.36"
 bevy_egui = { version = "0.39", default-features = false }
