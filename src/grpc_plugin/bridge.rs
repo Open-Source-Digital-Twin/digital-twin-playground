@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 use std::sync::{Arc, Mutex, RwLock};
 
 use bevy::prelude::*;
@@ -14,6 +14,14 @@ pub struct JointStateSnapshot {
     pub timestamp: f64,
 }
 
+/// Joint metadata and last published state.
+#[derive(Clone, Debug, Default)]
+pub struct JointRecord {
+    pub hinge_axis: Vec3,
+    pub motor_controllable: bool,
+    pub state: JointStateSnapshot,
+}
+
 /// A motor command sent from gRPC to Bevy.
 #[derive(Debug)]
 pub struct MotorCommandMsg {
@@ -23,10 +31,14 @@ pub struct MotorCommandMsg {
     pub enabled: bool,
 }
 
+/// Marker for joints that may be actuated via the gRPC API.
+#[derive(Component)]
+pub struct GrpcControllableJoint;
+
 /// Shared state between the Bevy main loop and the gRPC server thread.
 pub struct SharedBridgeState {
-    /// Latest joint states — Bevy writes, gRPC reads.
-    pub joint_states: RwLock<HashMap<String, JointStateSnapshot>>,
+    /// Latest joint metadata and states, keyed by stable joint name.
+    pub joints: RwLock<BTreeMap<String, JointRecord>>,
     /// Sender for motor commands — gRPC sends, Bevy receives.
     pub command_tx: mpsc::Sender<MotorCommandMsg>,
     /// Receiver for motor commands — Bevy drains each frame.

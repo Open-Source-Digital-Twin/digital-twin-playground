@@ -1,10 +1,11 @@
+use std::collections::{BTreeMap, BTreeSet};
 use std::sync::Arc;
 
 use tokio::sync::mpsc;
 use tokio_stream::wrappers::ReceiverStream;
 use tonic::{Request, Response, Status};
 
-use super::bridge::{MotorCommandMsg, SharedBridgeState};
+use super::bridge::{JointRecord, MotorCommandMsg, SharedBridgeState};
 use super::proto::joint_control_server::JointControl;
 use super::proto::*;
 
@@ -18,17 +19,22 @@ impl JointControl for JointControlService {
         &self,
         _request: Request<ListJointsRequest>,
     ) -> Result<Response<ListJointsResponse>, Status> {
-        let states = self.shared.joint_states.read().unwrap();
-        let joints = states
-            .keys()
+        let joints = self.shared.joints.read().unwrap();
+        let joints = joints
+            .iter()
             .enumerate()
-            .map(|(i, name)| JointInfo {
+            .map(|(i, (name, record))| JointInfo {
                 name: name.clone(),
                 index: i as u32,
                 joint_type: JointType::Revolute as i32,
                 body1_name: String::new(),
                 body2_name: String::new(),
-                hinge_axis: None,
+                hinge_axis: Some(Vec3 {
+                    x: record.hinge_axis.x,
+                    y: record.hinge_axis.y,
+                    z: record.hinge_axis.z,
+                }),
+                motor_controllable: record.motor_controllable,
             })
             .collect();
 
@@ -40,17 +46,17 @@ impl JointControl for JointControlService {
         request: Request<GetJointStateRequest>,
     ) -> Result<Response<JointState>, Status> {
         let req = request.into_inner();
-        let joint_name = extract_joint_name(&req.joint).map_err(|e| *e)?;
+        let joints = self.shared.joints.read().unwrap();
+        let joint_name = resolve_joint_name(&joints, &req.joint).map_err(|status| *status)?;
 
-        let states = self.shared.joint_states.read().unwrap();
-        match states.get(&joint_name) {
-            Some(s) => Ok(Response::new(JointState {
+        match joints.get(&joint_name) {
+            Some(record) => Ok(Response::new(JointState {
                 name: joint_name,
-                angle: s.angle,
-                angular_velocity: s.angular_velocity,
-                motor_target_velocity: s.motor_target_velocity,
-                motor_enabled: s.motor_enabled,
-                timestamp: s.timestamp,
+                angle: record.state.angle,
+                angular_velocity: record.state.angular_velocity,
+                motor_target_velocity: record.state.motor_target_velocity,
+                motor_enabled: record.state.motor_enabled,
+                timestamp: record.state.timestamp,
             })),
             None => Err(Status::not_found(format!(
                 "Joint '{}' not found",
@@ -64,10 +70,29 @@ impl JointControl for JointControlService {
         request: Request<SetMotorCommandRequest>,
     ) -> Result<Response<SetMotorCommandResponse>, Status> {
         let req = request.into_inner();
-        let joint_name = extract_joint_name(&req.joint).map_err(|e| *e)?;
         let cmd = req
             .command
             .ok_or_else(|| Status::invalid_argument("MotorCommand is required"))?;
+
+        let joint_name = {
+            let joints = self.shared.joints.read().unwrap();
+            let joint_name = resolve_joint_name(&joints, &req.joint).map_err(|status| *status)?;
+            let Some(record) = joints.get(&joint_name) else {
+                return Err(Status::not_found(format!(
+                    "Joint '{}' not found",
+                    joint_name
+                )));
+            };
+
+            if !record.motor_controllable {
+                return Err(Status::failed_precondition(format!(
+                    "Joint '{}' is not motor controllable",
+                    joint_name
+                )));
+            }
+
+            joint_name
+        };
 
         self.shared
             .command_tx
@@ -96,15 +121,10 @@ impl JointControl for JointControlService {
         let rate_hz = if req.rate_hz > 0.0 { req.rate_hz } else { 60.0 };
         let interval = std::time::Duration::from_secs_f32(1.0 / rate_hz);
 
-        // Collect requested joint names (empty = all joints).
-        let requested_names: Vec<String> = req
-            .joints
-            .iter()
-            .filter_map(|jid| match &jid.id {
-                Some(joint_id::Id::Name(n)) => Some(n.clone()),
-                _ => None,
-            })
-            .collect();
+        let requested_names = {
+            let joints = self.shared.joints.read().unwrap();
+            resolve_requested_joint_names(&joints, &req.joints).map_err(|status| *status)?
+        };
 
         let shared = self.shared.clone();
         let (tx, rx) = mpsc::channel(128);
@@ -115,19 +135,19 @@ impl JointControl for JointControlService {
 
                 // Collect snapshots while holding the lock, then drop it before awaiting sends.
                 let snapshots: Vec<JointState> = {
-                    let states = shared.joint_states.read().unwrap();
-                    states
+                    let joints = shared.joints.read().unwrap();
+                    joints
                         .iter()
                         .filter(|(name, _)| {
-                            requested_names.is_empty() || requested_names.contains(name)
+                            requested_names.is_empty() || requested_names.contains(*name)
                         })
-                        .map(|(name, s)| JointState {
+                        .map(|(name, record)| JointState {
                             name: name.clone(),
-                            angle: s.angle,
-                            angular_velocity: s.angular_velocity,
-                            motor_target_velocity: s.motor_target_velocity,
-                            motor_enabled: s.motor_enabled,
-                            timestamp: s.timestamp,
+                            angle: record.state.angle,
+                            angular_velocity: record.state.angular_velocity,
+                            motor_target_velocity: record.state.motor_target_velocity,
+                            motor_enabled: record.state.motor_enabled,
+                            timestamp: record.state.timestamp,
                         })
                         .collect()
                 };
@@ -144,17 +164,90 @@ impl JointControl for JointControlService {
     }
 }
 
-/// Extract the joint name from a `JointId` option.
-fn extract_joint_name(joint_id: &Option<JointId>) -> Result<String, Box<Status>> {
+fn resolve_joint_name(
+    joints: &BTreeMap<String, JointRecord>,
+    joint_id: &Option<JointId>,
+) -> Result<String, Box<Status>> {
     match joint_id {
         Some(JointId {
             id: Some(joint_id::Id::Name(name)),
-        }) => Ok(name.clone()),
+        }) => {
+            if joints.contains_key(name) {
+                Ok(name.clone())
+            } else {
+                Err(Box::new(Status::not_found(format!(
+                    "Joint '{}' not found",
+                    name
+                ))))
+            }
+        }
         Some(JointId {
-            id: Some(joint_id::Id::Index(_)),
-        }) => Err(Box::new(Status::unimplemented(
-            "Index-based joint lookup not yet implemented",
-        ))),
+            id: Some(joint_id::Id::Index(index)),
+        }) => joints.keys().nth(*index as usize).cloned().ok_or_else(|| {
+            Box::new(Status::not_found(format!(
+                "Joint index {} not found",
+                index
+            )))
+        }),
         _ => Err(Box::new(Status::invalid_argument("JointId is required"))),
+    }
+}
+
+fn resolve_requested_joint_names(
+    joints: &BTreeMap<String, JointRecord>,
+    joint_ids: &[JointId],
+) -> Result<BTreeSet<String>, Box<Status>> {
+    joint_ids
+        .iter()
+        .map(|joint_id| resolve_joint_name(joints, &Some(joint_id.clone())))
+        .collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use std::collections::BTreeMap;
+
+    use super::*;
+    use crate::grpc_plugin::bridge::JointStateSnapshot;
+
+    fn joint_record() -> JointRecord {
+        JointRecord {
+            hinge_axis: bevy::prelude::Vec3::Y,
+            motor_controllable: true,
+            state: JointStateSnapshot::default(),
+        }
+    }
+
+    #[test]
+    fn resolves_joint_name_by_index() {
+        let joints = BTreeMap::from([
+            (String::from("motor_joint"), joint_record()),
+            (String::from("pendulum_joint"), joint_record()),
+        ]);
+
+        let joint_name = resolve_joint_name(
+            &joints,
+            &Some(JointId {
+                id: Some(joint_id::Id::Index(1)),
+            }),
+        )
+        .unwrap();
+
+        assert_eq!(joint_name, "pendulum_joint");
+    }
+
+    #[test]
+    fn rejects_out_of_range_joint_index() {
+        let joints = BTreeMap::from([(String::from("motor_joint"), joint_record())]);
+
+        let error = resolve_joint_name(
+            &joints,
+            &Some(JointId {
+                id: Some(joint_id::Id::Index(9)),
+            }),
+        )
+        .unwrap_err();
+
+        assert_eq!(error.code(), tonic::Code::NotFound);
     }
 }

@@ -1,7 +1,7 @@
 use avian3d::prelude::*;
 use bevy::prelude::*;
 
-use super::bridge::GrpcBridge;
+use super::bridge::{GrpcBridge, GrpcControllableJoint};
 
 /// Publishes current joint states into the shared snapshot every frame.
 ///
@@ -9,29 +9,32 @@ use super::bridge::GrpcBridge;
 /// and computes the joint angle from the connected bodies' transforms.
 pub fn publish_joint_states(
     bridge: Res<GrpcBridge>,
-    joint_query: Query<(&RevoluteJoint, &Name)>,
+    joint_query: Query<(&RevoluteJoint, &Name, Has<GrpcControllableJoint>)>,
     body_query: Query<(&GlobalTransform, Option<&AngularVelocity>)>,
     time: Res<Time>,
 ) {
-    let mut states = bridge.shared.joint_states.write().unwrap();
+    let mut joints = bridge.shared.joints.write().unwrap();
 
-    for (joint, name) in joint_query.iter() {
+    for (joint, name, motor_controllable) in joint_query.iter() {
         let angle = compute_joint_angle(joint, &body_query);
         let ang_vel = compute_joint_angular_velocity(joint, &body_query);
+        let hinge_axis = joint_local_hinge_axis(joint);
 
-        let snapshot = states.entry(name.to_string()).or_default();
-        snapshot.angle = angle;
-        snapshot.angular_velocity = ang_vel;
-        snapshot.motor_target_velocity = joint.motor.target_velocity;
-        snapshot.motor_enabled = joint.motor.enabled;
-        snapshot.timestamp = time.elapsed_secs_f64();
+        let record = joints.entry(name.to_string()).or_default();
+        record.hinge_axis = hinge_axis;
+        record.motor_controllable = motor_controllable;
+        record.state.angle = angle;
+        record.state.angular_velocity = ang_vel;
+        record.state.motor_target_velocity = joint.motor.target_velocity;
+        record.state.motor_enabled = joint.motor.enabled;
+        record.state.timestamp = time.elapsed_secs_f64();
     }
 }
 
 /// Drains motor commands from the gRPC channel and applies them to the corresponding joints.
 pub fn apply_grpc_commands(
     bridge: Res<GrpcBridge>,
-    mut joints: Query<(&mut RevoluteJoint, &Name)>,
+    mut joints: Query<(&mut RevoluteJoint, &Name), With<GrpcControllableJoint>>,
 ) {
     let mut rx = bridge.shared.command_rx.lock().unwrap();
     while let Ok(cmd) = rx.try_recv() {
@@ -70,7 +73,7 @@ fn compute_joint_angle(
     let rot2 = transform2.compute_transform().rotation;
     let relative_rotation = rot2 * rot1.inverse();
 
-    let axis: Vec3 = joint.hinge_axis.into();
+    let axis = world_hinge_axis(rot1, joint_local_hinge_axis(joint));
     signed_angle_around_axis(relative_rotation, axis)
 }
 
@@ -81,6 +84,10 @@ fn compute_joint_angle(
 /// is w.  Therefore the full twist angle is `2 * atan2(dot(xyz, a), w)`,
 /// which naturally lies in (−π, π].
 fn signed_angle_around_axis(rotation: Quat, axis: Vec3) -> f32 {
+    if axis.length_squared() == 0.0 {
+        return 0.0;
+    }
+
     let xyz = Vec3::new(rotation.x, rotation.y, rotation.z);
     let projection = xyz.dot(axis);
     2.0 * f32::atan2(projection, rotation.w)
@@ -91,6 +98,17 @@ fn compute_joint_angular_velocity(
     joint: &RevoluteJoint,
     body_query: &Query<(&GlobalTransform, Option<&AngularVelocity>)>,
 ) -> f32 {
+    let world_axis = body_query
+        .get(joint.body1)
+        .ok()
+        .map(|(transform, _)| {
+            world_hinge_axis(
+                transform.compute_transform().rotation,
+                joint_local_hinge_axis(joint),
+            )
+        })
+        .unwrap_or(Vec3::ZERO);
+
     let vel1 = body_query
         .get(joint.body1)
         .ok()
@@ -106,6 +124,37 @@ fn compute_joint_angular_velocity(
         .unwrap_or(Vec3::ZERO);
 
     let relative_vel = vel2 - vel1;
-    // Project onto the hinge axis
-    relative_vel.dot(joint.hinge_axis)
+    // Project onto the hinge axis in world space.
+    relative_vel.dot(world_axis)
+}
+
+fn joint_local_hinge_axis(joint: &RevoluteJoint) -> Vec3 {
+    joint.hinge_axis.normalize_or_zero()
+}
+
+fn world_hinge_axis(body1_rotation: Quat, local_hinge_axis: Vec3) -> Vec3 {
+    (body1_rotation * local_hinge_axis).normalize_or_zero()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn extracts_signed_angle_around_world_axis() {
+        let axis = Vec3::Y;
+        let rotation = Quat::from_axis_angle(axis, std::f32::consts::FRAC_PI_2);
+
+        let angle = signed_angle_around_axis(rotation, axis);
+
+        assert!((angle - std::f32::consts::FRAC_PI_2).abs() < 1.0e-5);
+    }
+
+    #[test]
+    fn rotates_local_hinge_axis_into_world_space() {
+        let rotation = Quat::from_rotation_y(std::f32::consts::FRAC_PI_2);
+        let world_axis = world_hinge_axis(rotation, Vec3::Z);
+
+        assert!((world_axis - Vec3::X).length() < 1.0e-5);
+    }
 }
