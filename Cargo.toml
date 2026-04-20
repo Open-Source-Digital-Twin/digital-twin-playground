@@ -15,6 +15,14 @@ bevy_egui = { version = "0.39", default-features = false }
 bevy-persistent = { version = "0.10", features = ["all"] }
 serde = { version = "1.0", features = ["derive"] }
 dirs = "6.0"
+tonic = { version = "0.12", optional = true }
+prost = { version = "0.13", optional = true }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "time", "sync"], optional = true }
+tokio-stream = { version = "0.1", optional = true }
+tonic-reflection = { version = "0.12", optional = true }
+
+[build-dependencies]
+tonic-build = { version = "0.12", optional = true }
 
 # Enable a small amount of optimization in debug mode
 [profile.dev]
@@ -32,3 +40,4 @@ opt-level = 3
 default = ["embedded-model"]
 embedded-model = []
 blender-model = []
+grpc = ["tonic", "prost", "tokio", "tokio-stream", "tonic-build", "tonic-reflection"]

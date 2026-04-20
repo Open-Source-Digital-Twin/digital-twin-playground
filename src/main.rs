@@ -14,6 +14,8 @@ mod scene_viewer_plugin;
 
 mod config_plugin;
 mod grid_plugin;
+#[cfg(feature = "grpc")]
+mod grpc_plugin;
 
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
 #[cfg(feature = "embedded-model")]
@@ -21,6 +23,8 @@ use embedded_model::EmbeddedModelPlugin;
 use grid_plugin::GridPlugin;
 
 use config_plugin::ConfigPlugin;
+#[cfg(feature = "grpc")]
+use grpc_plugin::GrpcPlugin;
 
 fn main() {
     let mut app = App::new();
@@ -40,6 +44,10 @@ fn main() {
         PhysicsPlugins::default(),
         ConfigPlugin,
         GridPlugin,
+        #[cfg(feature = "grpc")]
+        GrpcPlugin {
+            addr: "0.0.0.0:50051".to_string(),
+        },
     ))
     .insert_resource(SubstepCount(12))
     .add_systems(Startup, setup);

@@ -35,7 +35,8 @@ struct Motor {
 ///           └─ cylinder_2 (child collider)  — horizontal arm, rotated 90° X, extends +Z
 ///   Body 2: pendulum (compound body)      — center (0, 4.5, 4.0)
 ///           ├─ cube_3     (parent collider) — pivot block at (0, 4.5, 4.0)
-///           └─ cylinder_3 (child collider)  — pendulum rod, hangs down
+///           ├─ cylinder_3 (child collider)  — pendulum rod, hangs down
+///           └─ sphere     (child collider)  — weighted tip at bottom of rod
 ///
 /// Joints:
 ///   Revolute + motor:  cube_1 ↔ motor_arm   (hinge Y, pivot at (0, 1, 0))
@@ -54,6 +55,7 @@ fn add_rotary_inverted_pendulum(
     const CUBE_SIZE: f32 = 1.0;
     const CYLINDER_RADIUS: f32 = 0.25;
     const CYLINDER_HEIGHT: f32 = 3.0;
+    const SPHERE_RADIUS: f32 = 0.5;
 
     let grey = materials.add(Color::srgb_u8(124, 124, 124));
 
@@ -133,6 +135,7 @@ fn add_rotary_inverted_pendulum(
                     ..default()
                 }),
             JointCollisionDisabled,
+            Name::new("motor_joint"),
         ))
         .id();
     motor.joint_entity = Some(joint_entity);
@@ -160,6 +163,18 @@ fn add_rotary_inverted_pendulum(
                     MeshMaterial3d(grey.clone()),
                     Transform::from_xyz(0.0, -(CUBE_SIZE / 2.0 + CYLINDER_HEIGHT / 2.0), 0.0),
                 ),
+                // Sphere — weighted tip at the bottom of the pendulum rod
+                (
+                    Collider::sphere(SPHERE_RADIUS),
+                    Mesh3d(meshes.add(Sphere::new(SPHERE_RADIUS))),
+                    MeshMaterial3d(grey.clone()),
+                    Transform::from_xyz(
+                        0.0,
+                        -(CUBE_SIZE / 2.0 + CYLINDER_HEIGHT + SPHERE_RADIUS),
+                        0.0,
+                    ),
+                    Name::new("pendulum_weight"),
+                ),
             ],
         ))
         .id();
@@ -177,6 +192,7 @@ fn add_rotary_inverted_pendulum(
             ))
             .with_local_anchor2(Vec3::new(0.0, 0.0, -CUBE_SIZE / 2.0)),
         JointCollisionDisabled,
+        Name::new("pendulum_joint"),
     ));
 }
 

@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+package digital_twin;
+
+message JointId {
+  oneof id {
+    string name = 1;
+    uint32 index = 2;
+  }
+}
+
+message JointInfo {
+  string name = 1;
+  uint32 index = 2;
+  JointType joint_type = 3;
+  string body1_name = 4;
+  string body2_name = 5;
+  Vec3 hinge_axis = 6;
+}
+
+enum JointType {
+  JOINT_TYPE_UNSPECIFIED = 0;
+  JOINT_TYPE_REVOLUTE = 1;
+  JOINT_TYPE_PRISMATIC = 2;
+  JOINT_TYPE_FIXED = 3;
+}
+
+message Vec3 {
+  float x = 1;
+  float y = 2;
+  float z = 3;
+}
+
+message JointState {
+  string name = 1;
+  float angle = 2;
+  float angular_velocity = 3;
+  float motor_target_velocity = 4;
+  bool motor_enabled = 5;
+  double timestamp = 6;
+}
+
+message MotorCommand {
+  float target_velocity = 1;
+  float max_torque = 2;
+  bool enabled = 3;
+}
+
+message ListJointsRequest {}
+
+message ListJointsResponse {
+  repeated JointInfo joints = 1;
+}
+
+message GetJointStateRequest {
+  JointId joint = 1;
+}
+
+message SetMotorCommandRequest {
+  JointId joint = 1;
+  MotorCommand command = 2;
+}
+
+message SetMotorCommandResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message StreamJointStatesRequest {
+  repeated JointId joints = 1;
+  float rate_hz = 2;
+}
+
+service JointControl {
+  rpc ListJoints(ListJointsRequest) returns (ListJointsResponse);
+  rpc GetJointState(GetJointStateRequest) returns (JointState);
+  rpc SetMotorCommand(SetMotorCommandRequest) returns (SetMotorCommandResponse);
+  rpc StreamJointStates(StreamJointStatesRequest) returns (stream JointState);
+}
