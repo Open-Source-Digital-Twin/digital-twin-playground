@@ -57,7 +57,8 @@ fn add_rotary_inverted_pendulum(
     const CUBE_SIZE: f32 = 1.0;
     const CYLINDER_RADIUS: f32 = 0.25;
     const CYLINDER_HEIGHT: f32 = 3.0;
-    const SPHERE_RADIUS: f32 = 0.5;
+    const PENDULUM_ROD_HEIGHT: f32 = CYLINDER_HEIGHT / 2.0; // 1.5 — halved to clear ground
+    const SPHERE_RADIUS: f32 = 0.75;
 
     let grey = materials.add(Color::srgb_u8(124, 124, 124));
 
@@ -132,7 +133,7 @@ fn add_rotary_inverted_pendulum(
                     max_torque: 10_000.0,
                     motor_model: MotorModel::AccelerationBased {
                         stiffness: 0.0,
-                        damping: 10.0,
+                        damping: 50.0,
                     },
                     ..default()
                 }),
@@ -160,12 +161,12 @@ fn add_rotary_inverted_pendulum(
             Name::new("pendulum"),
             SleepingDisabled,
             children![
-                // Cylinder 3 — pendulum rod, relative offset (0, -2.0, 0)
+                // Cylinder 3 — pendulum rod (half-length to clear ground with large sphere)
                 (
-                    Collider::cylinder(CYLINDER_RADIUS, CYLINDER_HEIGHT),
-                    Mesh3d(meshes.add(Cylinder::new(CYLINDER_RADIUS, CYLINDER_HEIGHT))),
+                    Collider::cylinder(CYLINDER_RADIUS, PENDULUM_ROD_HEIGHT),
+                    Mesh3d(meshes.add(Cylinder::new(CYLINDER_RADIUS, PENDULUM_ROD_HEIGHT))),
                     MeshMaterial3d(grey.clone()),
-                    Transform::from_xyz(0.0, -(CUBE_SIZE / 2.0 + CYLINDER_HEIGHT / 2.0), 0.0),
+                    Transform::from_xyz(0.0, -(CUBE_SIZE / 2.0 + PENDULUM_ROD_HEIGHT / 2.0), 0.0),
                 ),
                 // Sphere — weighted tip at the bottom of the pendulum rod
                 (
@@ -174,7 +175,7 @@ fn add_rotary_inverted_pendulum(
                     MeshMaterial3d(grey.clone()),
                     Transform::from_xyz(
                         0.0,
-                        -(CUBE_SIZE / 2.0 + CYLINDER_HEIGHT + SPHERE_RADIUS),
+                        -(CUBE_SIZE / 2.0 + PENDULUM_ROD_HEIGHT + SPHERE_RADIUS),
                         0.0,
                     ),
                     Name::new("pendulum_weight"),
@@ -192,7 +193,7 @@ fn add_rotary_inverted_pendulum(
             .with_local_anchor1(Vec3::new(
                 0.0,
                 CYLINDER_HEIGHT / 2.0 + CUBE_SIZE / 2.0,
-                CUBE_SIZE / 2.0 + CYLINDER_HEIGHT - CUBE_SIZE / 2.0,
+                CUBE_SIZE / 2.0 + CYLINDER_HEIGHT,
             ))
             .with_local_anchor2(Vec3::new(0.0, 0.0, -CUBE_SIZE / 2.0)),
         JointCollisionDisabled,
