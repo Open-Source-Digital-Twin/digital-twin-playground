@@ -15,7 +15,7 @@ bevy_egui = { version = "0.39", default-features = false }
 bevy-persistent = { version = "0.10", features = ["all"] }
 serde = { version = "1.0", features = ["derive"] }
 dirs = "6.0"
-tonic = { version = "0.12", optional = true }
+tonic = { version = "0.14", optional = true }
 prost = { version = "0.14", optional = true }
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "time", "sync"], optional = true }
 tokio-stream = { version = "0.1", optional = true }
