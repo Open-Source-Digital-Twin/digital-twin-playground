@@ -10,7 +10,7 @@ authors = ["Caio Piccirillo <caiopiccirillo@gmail.com>"]
 bevy = { version = "0.18", features = ["serialize"] }
 avian3d = "0.6.1"
 bevy_panorbit_camera = "0.34"
-bevy-inspector-egui = "0.36"
+bevy-inspector-egui = "0.37"
 bevy_egui = { version = "0.39", default-features = false }
 bevy-persistent = { version = "0.10", features = ["all"] }
 serde = { version = "1.0", features = ["derive"] }
