@@ -11,7 +11,7 @@ bevy = { version = "0.18", features = ["serialize"] }
 avian3d = "0.6.1"
 bevy_panorbit_camera = "0.34"
 bevy-inspector-egui = "0.36"
-bevy_egui = { version = "0.39", default-features = false }
+bevy_egui = { version = "0.40", default-features = false }
 bevy-persistent = { version = "0.10", features = ["all"] }
 serde = { version = "1.0", features = ["derive"] }
 dirs = "6.0"
